@@ -203,7 +203,7 @@ export default function WorkspaceSwitcher({ children, align = "start", side = "t
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
             >
               <Plus className="w-4 h-4 shrink-0" style={{ color: MUTED }} strokeWidth={2.5} />
-              مساحة عمل جديدة
+              New workspace
             </button>
           </div>
         </div>
