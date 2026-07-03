@@ -2,14 +2,18 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import type Lenis from "lenis";
+import { LazyMotion, domAnimation } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import LandingNavbar from "@/components/landing/LandingNavbar";
 import HeroSection from "@/components/landing/HeroSection";
-import FlyingMegsyStar from "@/components/landing/FlyingMegsyStar";
 import SEOHead from "@/components/common/SEOHead";
 import InViewSection from "@/components/common/InViewSection";
 import { LandingContentProvider, useLandingContent } from "@/lib/landing/LandingContentContext";
 import type { LocaleCode } from "@/lib/landing/i18n/locales";
+
+// Non-critical decorative overlay — defer to idle so it doesn't compete
+// with hero paint. Load only after the browser goes idle post-hydration.
+const FlyingMegsyStar = lazy(() => import("@/components/landing/FlyingMegsyStar"));
 
 // Below-the-fold — lazy load to keep landing FCP fast on weak devices
 const StatsMarquee = lazy(() => import("@/components/landing/StatsMarquee"));
