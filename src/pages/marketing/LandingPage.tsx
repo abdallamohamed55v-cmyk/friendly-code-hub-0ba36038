@@ -148,31 +148,37 @@ const LandingPage = ({ locale = "en" }: LandingPageProps) => {
   return (
     <LandingContentProvider locale={locale}>
       <LandingSEO />
-      <div data-theme="dark" className="min-h-dvh overflow-x-clip bg-background text-foreground">
-        <LandingNavbar />
-        <FlyingMegsyStar />
-        <main id="main">
-          <HeroSection />
-          {/* Each section is InViewSection: chunk downloads + component
-              hydrates only when the placeholder is near the viewport. This
-              keeps landing initial JS tiny even with 14 sections. */}
-          <InViewSection fallback={<SectionFallback />}><StatsMarquee /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><HorizontalGallery /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><StickyFeatureTabs /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><MegsyChatModelsSection /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><ParallaxShowcase /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><ShowcaseGallery /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><MegsyCodeModelsSection /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><CreativeBlueprintsSection /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><HowItWorks /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><PricingPreview /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><ReferralSection /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><FAQSection /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><CTASection /></InViewSection>
-          <InViewSection fallback={<SectionFallback />}><FinalHeroCTA /></InViewSection>
-        </main>
-        <InViewSection fallback={<SectionFallback />}><LandingFooter /></InViewSection>
-      </div>
+      <LazyMotion features={domAnimation} strict>
+        <div data-theme="dark" className="min-h-dvh overflow-x-clip bg-background text-foreground">
+          <LandingNavbar />
+          {starReady && (
+            <Suspense fallback={null}>
+              <FlyingMegsyStar />
+            </Suspense>
+          )}
+          <main id="main">
+            <HeroSection />
+            {/* Each section is InViewSection: chunk downloads + component
+                hydrates only when the placeholder is near the viewport. This
+                keeps landing initial JS tiny even with 14 sections. */}
+            <InViewSection fallback={<SectionFallback />}><StatsMarquee /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><HorizontalGallery /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><StickyFeatureTabs /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><MegsyChatModelsSection /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><ParallaxShowcase /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><ShowcaseGallery /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><MegsyCodeModelsSection /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><CreativeBlueprintsSection /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><HowItWorks /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><PricingPreview /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><ReferralSection /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><FAQSection /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><CTASection /></InViewSection>
+            <InViewSection fallback={<SectionFallback />}><FinalHeroCTA /></InViewSection>
+          </main>
+          <InViewSection fallback={<SectionFallback />}><LandingFooter /></InViewSection>
+        </div>
+      </LazyMotion>
     </LandingContentProvider>
   );
 };
