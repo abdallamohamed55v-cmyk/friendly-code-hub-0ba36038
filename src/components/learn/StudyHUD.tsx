@@ -1,7 +1,7 @@
 /** @doc Study HUD — the persistent progress bar for Learn Mode (streak, XP, Bloom rung, accuracy). Renders only when chatMode==="learning" and reads live from studyProgress via a subscription so every card answer updates it. */
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Flame, RotateCcw, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Flame, RotateCcw, Sparkles, Target, TrendingUp, Repeat } from "lucide-react";
 import {
   getStudyState,
   resetStudyState,
@@ -11,6 +11,7 @@ import {
   prefersReducedMotion,
   type StudyState,
 } from "@/lib/studyProgress";
+import { getDueSummary, subscribeMemory } from "@/lib/learnMemory";
 
 /**
  * A calm, sticky top strip that shows learners how they're doing at
@@ -92,6 +93,10 @@ export function StudyHUD() {
             hint={`${state.cardsCorrect}/${state.cardsAnswered}`}
           />
 
+          {/* Due review chip — surfaces spaced-repetition items */}
+          <DueChip />
+
+
           {/* Bloom rung — takes remaining space */}
           <div className="ms-auto min-w-0 hidden sm:flex items-center gap-2 flex-1 max-w-[220px]">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground shrink-0">
@@ -117,6 +122,28 @@ export function StudyHUD() {
     </div>
   );
 }
+
+function DueChip() {
+  const summary = useSyncExternalStore(
+    subscribeMemory,
+    () => getDueSummary(Date.now(), 3),
+    () => getDueSummary(Date.now(), 3),
+  );
+  const count = summary.count;
+  if (count === 0) return null;
+  const label = count === 1 ? "1 due" : `${count} due`;
+  return (
+    <div
+      className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-amber-400/40 bg-amber-500/10 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-300"
+      title="Items due for spaced-repetition review — ask the tutor to /review"
+      aria-label={`${count} items due for review`}
+    >
+      <Repeat className="w-3 h-3" />
+      {label}
+    </div>
+  );
+}
+
 
 function ResetButton() {
   const [armed, setArmed] = useState(false);

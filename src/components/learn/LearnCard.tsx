@@ -3,8 +3,30 @@ import { m as motion, AnimatePresence } from "framer-motion";
 import { ArrowUp, Check, ChevronRight, Flame, Lightbulb, Sparkles, X } from "lucide-react";
 import type { LearnCardData } from "@/lib/learnCardParser";
 import { detectLearnLocale, getLearnStrings, type LearnLocale } from "@/lib/learnCardI18n";
-import { recordAnswer, hapticFeedback, setStudyTopic } from "@/lib/studyProgress";
+import { recordAnswer, hapticFeedback, setStudyTopic, getStudyState } from "@/lib/studyProgress";
+import { logItem, logMistake, hashCardKey, noteTopicVisit } from "@/lib/learnMemory";
 import { ConfettiBurst } from "@/components/common/ConfettiBurst";
+
+// Stable key per rendered card — used to dedupe answers across React
+// re-renders and stream resumes, and to key mistakes/items in memory.
+function cardKey(card: any): string {
+  const raw =
+    (card && (card.id || card.uid || card.key)) ||
+    JSON.stringify({
+      t: card?.type,
+      q: card?.question || card?.title || card?.problem || card?.front,
+      o: card?.options,
+      c: card?.correct,
+    });
+  return hashCardKey(String(raw));
+}
+
+// Resolve topic for memory logging: prefer card.topic, else the
+// session's tracked topic. Empty string when unknown.
+function cardTopic(card: any): string {
+  const t = card?.topic || card?.subject || getStudyState().topic || "";
+  return String(t || "").trim();
+}
 
 /* ============================================================
  * Learn Mode — refined card system
@@ -296,6 +318,20 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
       hintLevel: hintLevel as 0 | 1 | 2,
     });
     hapticFeedback(wasRight ? "correct" : "wrong");
+    // Durable memory: log the item (dedup by cardKey) and, on failure,
+    // capture the exact misconception so the tutor can pre-empt it.
+    const _cid = cardKey(card);
+    const _topic = cardTopic(card);
+    logItem({ cardId: _cid, topic: _topic, type: "mcq", correct: wasRight, hintLevel });
+    if (!wasRight) {
+      logMistake({
+        cardId: _cid,
+        topic: _topic,
+        question: String(card.question || ""),
+        chosen: `${chosenLetter}) ${options[i]}`,
+        correct: `${correctLetter}) ${correctText}`,
+      });
+    }
     // Celebrate: fire confetti on any streak milestone (3, 5, 10, 20…).
     if (wasRight && nextState.streak >= 3) {
       const milestone = nextState.streak;
@@ -577,6 +613,18 @@ const MultiCard = ({ card, onAnswer }: BaseProps) => {
               picks.length === correctSet.size && picks.every((p) => correctSet.has(p));
             recordAnswer({ correct: isAllRight, cardType: "multi" });
             hapticFeedback(isAllRight ? "correct" : "wrong");
+            const _cid = cardKey(card);
+            const _topic = cardTopic(card);
+            logItem({ cardId: _cid, topic: _topic, type: "multi", correct: isAllRight });
+            if (!isAllRight) {
+              logMistake({
+                cardId: _cid,
+                topic: _topic,
+                question: String(card.question || ""),
+                chosen: chosenText,
+                correct: correctText,
+              });
+            }
             const payload = isAllRight
               ? `[LEARN_ANSWER] type=multi result=correct chosen=[${chosenText}]`
               : `[LEARN_ANSWER] type=multi result=incorrect chosen=[${chosenText}] correct=[${correctText}]`;
@@ -615,6 +663,18 @@ const TrueFalseCard = ({ card, onAnswer }: BaseProps) => {
     const wasRight = val === card.correct;
     recordAnswer({ correct: wasRight, cardType: "truefalse" });
     hapticFeedback(wasRight ? "correct" : "wrong");
+    const _cid = cardKey(card);
+    const _topic = cardTopic(card);
+    logItem({ cardId: _cid, topic: _topic, type: "truefalse", correct: wasRight });
+    if (!wasRight) {
+      logMistake({
+        cardId: _cid,
+        topic: _topic,
+        question: String(card.question || ""),
+        chosen: label,
+        correct: card.correct ? tt.correct : tt.wrong,
+      });
+    }
     const payload = wasRight
       ? `[LEARN_ANSWER] type=truefalse result=correct chosen="${label}"`
       : `[LEARN_ANSWER] type=truefalse result=incorrect chosen="${label}" correct="${card.correct ? tt.correct : tt.wrong}"`;
@@ -1825,7 +1885,10 @@ const LearnCard = ({
       (card as any).subject ||
       (card as any).title ||
       "";
-    if (t) setStudyTopic(String(t));
+    if (t) {
+      setStudyTopic(String(t));
+      noteTopicVisit(String(t));
+    }
   }, [card]);
 
   switch (card.type) {
