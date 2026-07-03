@@ -4199,7 +4199,7 @@ const STATIC_GROUPS: DocGroup[] = [
           {
             kind: "ol",
             items: [
-              "Admin opens the Megsy bot in Telegram → main menu → 🎁 منح Pro لمؤثر (شهر).",
+              "Admin opens the Megsy bot in Telegram → main menu → 🎁 Grant Pro to influencer (1 month).",
               "Admin pastes the influencer's signup email.",
               "Bot activates plan = pro, status = active, current_period_end = +30 days, then notifies the admin channel.",
             ],

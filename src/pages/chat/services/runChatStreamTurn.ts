@@ -227,7 +227,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
     if (!safeChunk.trim()) return;
     if (videoGenerationActive) {
       if (generatedVideos.length > 0) {
-        assistantContent = "اتفضل الفيديو 👇";
+        assistantContent = "Here is your video 👇";
         scheduleAssistantUpdate(true);
       }
       return;
@@ -656,7 +656,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
                   const next = prev.slice();
                   next[targetIndex] = {
                     ...last,
-                    content: last.content?.trim() ? last.content : "اتفضل الفيديو 👇",
+                    content: last.content?.trim() ? last.content : "Here is your video 👇",
                     videos: [...existing, url],
                   };
                   return next;
@@ -748,7 +748,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
       }
       const hasGeneratedVideo = generatedVideos.length > 0;
       if (hasGeneratedVideo) {
-        assistantContent = "اتفضل الفيديو 👇";
+        assistantContent = "Here is your video 👇";
         setMessages((prev) => {
           const idx = prev.findIndex((m) => m.clientId === `assistant-${localTurnId}`);
           const targetIndex = idx >= 0 ? idx : prev.length - 1;
@@ -781,7 +781,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           // replace the whole text with a clean single sentence.
           const WEBSITE_LEAK_RE = /(افتح\s*الموقع|خلال\s*دقيق|ready in (?:a|1)?\s*-?\s*\d?\s*minute|open the site|preview_url|سيكون جاهز|متوفر الآن!?\s*افتح)/i;
           if (WEBSITE_LEAK_RE.test(assistantContent)) {
-            assistantContent = "اتفضل الفيديو 👇";
+            assistantContent = "Here is your video 👇";
           }
           setMessages((prev) => {
             const idx = prev.findIndex((m) => m.clientId === `assistant-${localTurnId}`);
@@ -809,7 +809,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
             const WEBSITE_LEAK_RE = /(افتح\s*الموقع|خلال\s*دقيق|ready in (?:a|1)?\s*-?\s*\d?\s*minute|open the site|preview_url|سيكون جاهز|متوفر الآن!?\s*افتح)/i;
             if (!WEBSITE_LEAK_RE.test(last.content || "")) return prev;
             const next = prev.slice();
-            assistantContent = "اتفضل الفيديو 👇";
+            assistantContent = "Here is your video 👇";
             next[targetIndex] = { ...last, content: assistantContent };
             return next;
           });

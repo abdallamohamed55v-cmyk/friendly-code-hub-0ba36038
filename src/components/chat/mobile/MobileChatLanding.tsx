@@ -623,17 +623,17 @@ const MobileChatLanding = ({
     if (isCleopatra) {
       if (firstName) {
         return [
-          `يا ${firstName}، نبدأ منين النهارده؟`,
-          `يا ${firstName}، إيه اللي هنعمله سوا؟`,
-          `يا ${firstName}، قوللي أول فكرة في دماغك`,
-          `يا ${firstName}، أنا تحت أمرك`,
+          `Hey ${firstName}, where do we start today?`,
+          `Hey ${firstName}, what are we building together?`,
+          `Hey ${firstName}, tell me the first idea on your mind`,
+          `Hey ${firstName}, I'm ready when you are`,
         ];
       }
       return [
-        "نبدأ منين النهارده؟",
-        "إيه اللي هنعمله سوا؟",
-        "قوللي أول فكرة في دماغك",
-        "أنا تحت أمرك",
+        "Where do we start today?",
+        "What are we building together?",
+        "Tell me the first idea on your mind",
+        "I'm ready when you are",
       ];
     }
     if (firstName) {
@@ -745,9 +745,9 @@ const MobileChatLanding = ({
                   const partEn =
                     h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
                   const partAr =
-                    h < 12 ? "صباح الخير" : h < 18 ? "مساء الخير" : "مساء الخير";
+                    h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
                   if (isCleopatra) {
-                    return firstName ? `${partAr}، ${firstName}` : partAr;
+                    return firstName ? `${partAr}, ${firstName}` : partAr;
                   }
                   return firstName ? `${partEn}, ${firstName}` : partEn;
                 })()}

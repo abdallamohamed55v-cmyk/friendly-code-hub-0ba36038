@@ -24,7 +24,7 @@ export default function PublishedSitePage() {
         .maybeSingle();
       if (!alive) return;
       if (error || !data) {
-        setError("هذا المشروع غير موجود أو أنه غير عام.");
+        setError("This project does not exist or is not public.");
       } else {
         setHtml(data.html_compiled as string);
         if (data.title) {
@@ -42,7 +42,7 @@ export default function PublishedSitePage() {
   if (loading) {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-black text-white/70 text-sm">
-        جاري تحميل المشروع…
+        Loading project…
       </div>
     );
   }
@@ -50,13 +50,13 @@ export default function PublishedSitePage() {
   if (error || !html) {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center bg-black text-white gap-4 px-6 text-center">
-        <h1 className="text-xl font-bold">تعذّر عرض المشروع</h1>
+        <h1 className="text-xl font-bold">Unable to display project</h1>
         <p className="text-white/60 text-sm max-w-md">{error}</p>
         <Link
           to="/"
           className="mt-2 rounded-full bg-white text-black px-5 py-2 text-sm font-semibold"
         >
-          العودة للرئيسية
+          Back to home
         </Link>
       </div>
     );

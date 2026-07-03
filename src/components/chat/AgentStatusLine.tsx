@@ -101,11 +101,11 @@ const AgentStatusLine = ({ searchStatus, toolActivity, userText }: AgentStatusLi
   // Egyptian labels for Cleopatra / Arabic; English otherwise.
   const L = ar
     ? {
-        thinking: "بفكّر…",
-        thinkingDeep: "بفكّر بعمق…",
-        working: "بشتغل…",
-        done: "خلصت",
-        failed: "في مشكلة",
+        thinking: "Thinking…",
+        thinkingDeep: "Thinking deeply…",
+        working: "Working…",
+        done: "Done",
+        failed: "Something went wrong",
       }
     : {
         thinking: "Thinking…",
@@ -176,7 +176,7 @@ const AgentStatusLine = ({ searchStatus, toolActivity, userText }: AgentStatusLi
 
   const canExpand = thoughtLog.length > 0 || elapsed > 1200;
   const seconds = Math.max(1, Math.round(elapsed / 1000));
-  const expandLabel = ar ? `فكّرت لـ ${seconds} ث` : `Thought for ${seconds}s`;
+  const expandLabel = `Thought for ${seconds}s`;
 
   return (
     <div
@@ -221,7 +221,7 @@ const AgentStatusLine = ({ searchStatus, toolActivity, userText }: AgentStatusLi
                 {expandLabel}
               </div>
               {thoughtLog.length === 0 ? (
-                <div className="text-foreground/60">{ar ? "بفكّر…" : "Thinking…"}</div>
+                <div className="text-foreground/60">Thinking…</div>
               ) : (
                 <ul className="space-y-1">
                   {thoughtLog.map((t, i) => (

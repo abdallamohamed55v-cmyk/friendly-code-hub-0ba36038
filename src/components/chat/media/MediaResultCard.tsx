@@ -302,7 +302,7 @@ export default function MediaResultCard({
               <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
               <span>
                 {mergeError ||
-                  "دمج المقاطع على الخادم غير متاح حاليًا. نزّل المقاطع وادمجها محليًا."}
+                  "Server-side clip merging is not available. Download the clips and merge them locally."}
               </span>
             </div>
           ) : mergeStatus === "error" ? (

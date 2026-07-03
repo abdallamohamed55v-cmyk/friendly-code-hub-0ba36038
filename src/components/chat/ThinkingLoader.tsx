@@ -22,8 +22,8 @@ const ThinkingLoader = ({ searchStatus }: ThinkingLoaderProps) => {
 
   const starColor = isCleopatra ? "#C9A84C" : "#5B8DEF";
   const starClass = isCleopatra ? "" : "text-[#5B8DEF]";
-  const thinkingLabel = isCleopatra ? "بفكّر…" : "Thinking…";
-  const deepLabel = isCleopatra ? "بفكّر بعمق…" : "Thinking deeply…";
+  const thinkingLabel = "Thinking…";
+  const deepLabel = "Thinking deeply…";
   const rtl = isCleopatra;
 
   if (searchStatus?.trim()) {

@@ -221,9 +221,9 @@ export default function MarketingDashboard() {
   }, []);
 
   async function createCampaign() {
-    if (!newCampaign.name.trim()) return toast.error("اكتب اسم الحملة");
+    if (!newCampaign.name.trim()) return toast.error("Enter a campaign name");
     const { data: u } = await supabase.auth.getUser();
-    if (!u?.user) return toast.error("سجّل دخول أولاً");
+    if (!u?.user) return toast.error("Sign in first");
     const { error, data } = await supabase
       .from("marketing_campaigns")
       .insert({
@@ -241,7 +241,7 @@ export default function MarketingDashboard() {
       .select("id")
       .single();
     if (error) return toast.error(error.message);
-    toast.success("تم إنشاء الحملة");
+    toast.success("Campaign created");
     setNewCampaign({
       name: "",
       goal: "",
@@ -255,21 +255,21 @@ export default function MarketingDashboard() {
   }
 
   async function deleteCampaign(id: string) {
-    if (!confirm("حذف الحملة وكل بياناتها؟")) return;
+    if (!confirm("Delete this campaign and all its data?")) return;
     const { error } = await supabase.from("marketing_campaigns").delete().eq("id", id);
     if (error) return toast.error(error.message);
     load();
   }
 
   async function addAccount() {
-    if (!activeCampaignId) return toast.error("اختر حملة أولاً");
+    if (!activeCampaignId) return toast.error("Choose a campaign first");
     const { data: u } = await supabase.auth.getUser();
     if (!u?.user) return;
     let creds: any = {};
     try {
       creds = JSON.parse(newAccount.credentials || "{}");
     } catch {
-      return toast.error("Credentials لازم تكون JSON صحيح");
+      return toast.error("Credentials must be valid JSON");
     }
     const { error } = await supabase.from("marketing_accounts").insert({
       user_id: u.user.id,
@@ -280,7 +280,7 @@ export default function MarketingDashboard() {
       credentials: creds,
     });
     if (error) return toast.error(error.message);
-    toast.success("تم ربط الحساب");
+    toast.success("Account connected");
     setNewAccount({ platform: "telegram", handle: "", display_name: "", credentials: "{}" });
     load();
   }
@@ -297,11 +297,11 @@ export default function MarketingDashboard() {
         body: { action: "test-account", account_id: id },
       });
       if (error) throw error;
-      if ((data as any)?.ok) toast.success("الاتصال شغّال ✅");
-      else toast.error((data as any)?.error || "فشل اختبار الاتصال");
+      if ((data as any)?.ok) toast.success("Connection works ✅");
+      else toast.error((data as any)?.error || "Connection test failed");
       load();
     } catch (e: any) {
-      toast.error(e?.message || "فشل");
+      toast.error(e?.message || "Failed");
     } finally {
       setTestingId(null);
     }
@@ -315,14 +315,14 @@ export default function MarketingDashboard() {
       });
       if (error) throw error;
       if ((data as any)?.success) {
-        toast.success("تم النشر ✅");
+        toast.success("Published ✅");
         if ((data as any).external_url) window.open((data as any).external_url, "_blank");
       } else {
-        toast.error((data as any)?.error || "فشل النشر");
+        toast.error((data as any)?.error || "Publish failed");
       }
       load();
     } catch (e: any) {
-      toast.error(e?.message || "فشل");
+      toast.error(e?.message || "Failed");
     } finally {
       setPublishingId(null);
     }
@@ -357,8 +357,8 @@ export default function MarketingDashboard() {
   }
 
   async function generatePost() {
-    if (!activeCampaignId) return toast.error("اختر حملة");
-    if (!genForm.topic.trim()) return toast.error("اكتب موضوع البوست");
+    if (!activeCampaignId) return toast.error("Choose a campaign");
+    if (!genForm.topic.trim()) return toast.error("Enter a post topic");
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke("marketing-generate-content", {
@@ -372,11 +372,11 @@ export default function MarketingDashboard() {
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
-      toast.success("تم توليد البوست ✨");
+      toast.success("Post generated ✨");
       setGenForm({ ...genForm, topic: "" });
       load();
     } catch (e: any) {
-      toast.error(e?.message || "فشل التوليد");
+      toast.error(e?.message || "Generation failed");
     } finally {
       setGenerating(false);
     }
@@ -402,14 +402,14 @@ export default function MarketingDashboard() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Sparkles className="h-7 w-7 text-primary" /> التسويق الآلي
+            <Sparkles className="h-7 w-7 text-primary" /> Marketing Automation
           </h1>
-          <p className="text-muted-foreground">احكم حملاتك على كل المنصات من مكان واحد</p>
+          <p className="text-muted-foreground">Run your campaigns across every platform from one place</p>
         </div>
         {campaigns.length > 0 && (
           <Select value={activeCampaignId} onValueChange={setActiveCampaignId}>
             <SelectTrigger className="w-64">
-              <SelectValue placeholder="اختر حملة" />
+              <SelectValue placeholder="Choose a campaign" />
             </SelectTrigger>
             <SelectContent>
               {campaigns.map((c) => (
@@ -426,24 +426,24 @@ export default function MarketingDashboard() {
         <CardContent className="p-3 flex gap-2 items-start text-xs">
           <ShieldAlert className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
           <p>
-            النشر يتم فقط على حسابات/قنوات تملكها وتربطها بنفسك عبر API/OAuth رسمي. النظام يحترم
-            rate limits وToS كل منصة، ولا يدعم mass-account abuse أو تلاعب بالـ trends. مسؤوليتك
-            الالتزام بسياسات كل منصة تنشر عليها.
+            Posts only go to accounts/channels you own and connect yourself via official API/OAuth. The system
+            respects each platform's rate limits and ToS, and does not support mass-account abuse or trend manipulation.
+            You are responsible for complying with the policies of every platform you publish to.
           </p>
         </CardContent>
       </Card>
 
       <Tabs defaultValue="campaigns" className="space-y-4">
         <TabsList className="flex-wrap h-auto">
-          <TabsTrigger value="campaigns">الحملات</TabsTrigger>
-          <TabsTrigger value="accounts">الحسابات</TabsTrigger>
-          <TabsTrigger value="generate">توليد محتوى</TabsTrigger>
-          <TabsTrigger value="posts">البوستات</TabsTrigger>
+          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+          <TabsTrigger value="accounts">Accounts</TabsTrigger>
+          <TabsTrigger value="generate">Generate content</TabsTrigger>
+          <TabsTrigger value="posts">Posts</TabsTrigger>
           <TabsTrigger value="queue">
-            القائمة (
+            Queue (
             {queue.filter((q) => ["queued", "retrying", "publishing"].includes(q.status)).length})
           </TabsTrigger>
-          <TabsTrigger value="logs">السجل</TabsTrigger>
+          <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>
 
         {/* CAMPAIGNS */}
@@ -451,29 +451,29 @@ export default function MarketingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Plus className="h-4 w-4" /> حملة جديدة
+                <Plus className="h-4 w-4" /> New campaign
               </CardTitle>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-3">
               <Input
-                placeholder="اسم الحملة"
+                placeholder="Campaign name"
                 value={newCampaign.name}
                 onChange={(e) => setNewCampaign({ ...newCampaign, name: e.target.value })}
               />
               <Input
-                placeholder="الهدف"
+                placeholder="Goal"
                 value={newCampaign.goal}
                 onChange={(e) => setNewCampaign({ ...newCampaign, goal: e.target.value })}
               />
               <Input
-                placeholder="الجمهور المستهدف"
+                placeholder="Target audience"
                 value={newCampaign.target_audience}
                 onChange={(e) =>
                   setNewCampaign({ ...newCampaign, target_audience: e.target.value })
                 }
               />
               <Input
-                placeholder="الهاشتاجات (مفصولة بمسافة)"
+                placeholder="Hashtags (space-separated)"
                 value={newCampaign.hashtags}
                 onChange={(e) => setNewCampaign({ ...newCampaign, hashtags: e.target.value })}
               />
@@ -485,11 +485,11 @@ export default function MarketingDashboard() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="professional">احترافي</SelectItem>
-                  <SelectItem value="casual">عفوي</SelectItem>
-                  <SelectItem value="funny">مرح</SelectItem>
-                  <SelectItem value="inspiring">ملهم</SelectItem>
-                  <SelectItem value="educational">تعليمي</SelectItem>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="casual">Casual</SelectItem>
+                  <SelectItem value="funny">Funny</SelectItem>
+                  <SelectItem value="inspiring">Inspiring</SelectItem>
+                  <SelectItem value="educational">Educational</SelectItem>
                 </SelectContent>
               </Select>
               <Select
@@ -500,13 +500,13 @@ export default function MarketingDashboard() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="qwen-max">qwen-max (أفضل جودة)</SelectItem>
-                  <SelectItem value="qwen-plus">qwen-plus (متوازن)</SelectItem>
-                  <SelectItem value="qwen-turbo">qwen-turbo (أسرع)</SelectItem>
+                  <SelectItem value="qwen-max">qwen-max (best quality)</SelectItem>
+                  <SelectItem value="qwen-plus">qwen-plus (balanced)</SelectItem>
+                  <SelectItem value="qwen-turbo">qwen-turbo (fastest)</SelectItem>
                 </SelectContent>
               </Select>
               <Button className="md:col-span-2" onClick={createCampaign}>
-                إنشاء
+                Create
               </Button>
             </CardContent>
           </Card>
@@ -518,7 +518,7 @@ export default function MarketingDashboard() {
                   <CardTitle className="text-lg">{c.name}</CardTitle>
                   <div className="flex gap-1">
                     <Button size="sm" variant="outline" onClick={() => toggleCampaignActive(c)}>
-                      {c.active ? "إيقاف" : "تشغيل"}
+                      {c.active ? "Pause" : "Start"}
                     </Button>
                     <Button size="icon" variant="ghost" onClick={() => deleteCampaign(c.id)}>
                       <Trash2 className="h-4 w-4" />
@@ -535,13 +535,13 @@ export default function MarketingDashboard() {
                     ))}
                   </div>
                   <Badge variant={c.active ? "default" : "outline"}>
-                    {c.active ? "نشطة" : "متوقفة"}
+                    {c.active ? "Active" : "Paused"}
                   </Badge>
                 </CardContent>
               </Card>
             ))}
             {!loading && !campaigns.length && (
-              <p className="text-muted-foreground">لا توجد حملات بعد.</p>
+              <p className="text-muted-foreground">No campaigns yet.</p>
             )}
           </div>
         </TabsContent>
@@ -551,7 +551,7 @@ export default function MarketingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <LinkIcon className="h-4 w-4" /> ربط حساب جديد
+                <LinkIcon className="h-4 w-4" /> Connect new account
               </CardTitle>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-3">
@@ -586,14 +586,14 @@ export default function MarketingDashboard() {
                 onChange={(e) => setNewAccount({ ...newAccount, handle: e.target.value })}
               />
               <Input
-                placeholder="اسم العرض"
+                placeholder="Display name"
                 className="md:col-span-2"
                 value={newAccount.display_name}
                 onChange={(e) => setNewAccount({ ...newAccount, display_name: e.target.value })}
               />
               {selectedMeta && (
                 <div className="md:col-span-2 text-xs space-y-1 bg-muted/40 rounded p-2">
-                  <p className="font-semibold">الحقول المطلوبة لـ {selectedMeta.label}:</p>
+                  <p className="font-semibold">Required fields for {selectedMeta.label}:</p>
                   <ul className="list-disc list-inside space-y-0.5">
                     {selectedMeta.credentialFields.map((f) => (
                       <li key={f.key}>
@@ -610,7 +610,7 @@ export default function MarketingDashboard() {
                   </ul>
                   {!selectedMeta.enabled && (
                     <p className="text-amber-700 dark:text-amber-400">
-                      ⚠ Adapter معطّل افتراضياً — يحتاج موافقة المنصة. {selectedMeta.notes}
+                      ⚠ Adapter disabled by default — needs platform approval. {selectedMeta.notes}
                     </p>
                   )}
                 </div>
@@ -623,7 +623,7 @@ export default function MarketingDashboard() {
                 rows={6}
               />
               <Button className="md:col-span-2" onClick={addAccount} disabled={!activeCampaignId}>
-                ربط الحساب
+                Connect account
               </Button>
             </CardContent>
           </Card>
@@ -642,16 +642,16 @@ export default function MarketingDashboard() {
                           variant={a.enabled === false ? "outline" : "default"}
                           className="text-xs"
                         >
-                          {a.enabled === false ? "موقوف" : "مفعّل"}
+                          {a.enabled === false ? "Disabled" : "Enabled"}
                         </Badge>
                         {a.last_test_ok === true && (
                           <Badge variant="secondary" className="text-xs">
-                            ✓ متصل
+                            ✓ Connected
                           </Badge>
                         )}
                         {a.last_test_ok === false && (
                           <Badge variant="destructive" className="text-xs">
-                            ✗ خطأ
+                            ✗ Error
                           </Badge>
                         )}
                       </div>
@@ -675,17 +675,17 @@ export default function MarketingDashboard() {
                       ) : (
                         <Wifi className="h-3 w-3 mr-1" />
                       )}
-                      اختبار
+                      Test
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => toggleAccountEnabled(a)}>
-                      {a.enabled === false ? "تفعيل" : "إيقاف"}
+                      {a.enabled === false ? "Enable" : "Disable"}
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
             {!campaignAccounts.length && (
-              <p className="text-muted-foreground">لا حسابات مربوطة بهذه الحملة.</p>
+              <p className="text-muted-foreground">No accounts connected to this campaign.</p>
             )}
           </div>
         </TabsContent>
@@ -695,12 +695,12 @@ export default function MarketingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" /> توليد بوست بـ Qwen
+                <Sparkles className="h-4 w-4 text-primary" /> Generate a post with Qwen
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Textarea
-                placeholder="موضوع البوست (مثل: إطلاق ميزة جديدة، نصيحة اليوم...)"
+                placeholder="Post topic (e.g. Launching a new feature, tip of the day…)"
                 value={genForm.topic}
                 onChange={(e) => setGenForm({ ...genForm, topic: e.target.value })}
                 rows={3}
@@ -714,14 +714,14 @@ export default function MarketingDashboard() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ar">العربية</SelectItem>
+                    <SelectItem value="ar">Arabic</SelectItem>
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="fr">Français</SelectItem>
                     <SelectItem value="es">Español</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground self-center">
-                  المنصات: لو لم تختر شيئاً، يستخدم كل حسابات الحملة.
+                  Platforms: if you leave this empty, all accounts on the campaign are used.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -746,11 +746,11 @@ export default function MarketingDashboard() {
                 ) : (
                   <Sparkles className="h-4 w-4 mr-2" />
                 )}
-                توليد بوست
+                Generate post
               </Button>
               {activeCampaign && (
                 <p className="text-xs text-muted-foreground">
-                  النموذج: {activeCampaign.ai_model} · UTM للروابط:{" "}
+                  Model: {activeCampaign.ai_model} · UTM for links:{" "}
                   {buildUtmLink("https://megsyai.com", "platform")}
                 </p>
               )}
@@ -764,9 +764,9 @@ export default function MarketingDashboard() {
             <Card key={p.id}>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle className="text-base">{p.title || "بدون عنوان"}</CardTitle>
+                  <CardTitle className="text-base">{p.title || "Untitled"}</CardTitle>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(p.created_at).toLocaleString("ar")}
+                    {new Date(p.created_at).toLocaleString("en")}
                   </p>
                 </div>
                 <Badge
@@ -802,7 +802,7 @@ export default function MarketingDashboard() {
                             ) : (
                               <Send className="h-3 w-3 mr-1" />
                             )}
-                            نشر على {a.platform} {a.handle ? `(@${a.handle})` : ""}
+                            Publish to {a.platform} {a.handle ? `(@${a.handle})` : ""}
                           </Button>
                         );
                       })}
@@ -811,7 +811,7 @@ export default function MarketingDashboard() {
                 {p.platform_variants && Object.keys(p.platform_variants).length > 0 && (
                   <details className="text-xs">
                     <summary className="cursor-pointer text-muted-foreground">
-                      نسخ المنصات ({Object.keys(p.platform_variants).length})
+                      Platform variants ({Object.keys(p.platform_variants).length})
                     </summary>
                     <div className="space-y-2 mt-2">
                       {Object.entries(p.platform_variants).map(([plat, text]) => (
@@ -830,14 +830,14 @@ export default function MarketingDashboard() {
           ))}
           {!campaignPosts.length && (
             <p className="text-muted-foreground">
-              لا بوستات بعد. ولّد أول واحد من تبويب "توليد محتوى".
+              No posts yet. Generate the first one from the "Generate content" tab.
             </p>
           )}
         </TabsContent>
 
         {/* QUEUE */}
         <TabsContent value="queue" className="space-y-2">
-          {queue.length === 0 && <p className="text-muted-foreground">القائمة فارغة.</p>}
+          {queue.length === 0 && <p className="text-muted-foreground">Queue is empty.</p>}
           {queue.map((q) => (
             <Card key={q.id}>
               <CardContent className="p-3 flex items-center justify-between text-sm">
@@ -855,7 +855,7 @@ export default function MarketingDashboard() {
                     {q.status}
                   </Badge>
                   <p className="text-xs text-muted-foreground mt-1">
-                    محاولات: {q.attempts} · التالي:{" "}
+                    Attempts: {q.attempts} · Next:{" "}
                     {new Date(q.next_attempt_at).toLocaleString("ar")}
                   </p>
                   {q.last_error && <p className="text-xs text-destructive">{q.last_error}</p>}
@@ -867,7 +867,7 @@ export default function MarketingDashboard() {
                     rel="noreferrer"
                     className="text-xs underline"
                   >
-                    فتح
+                    Open
                   </a>
                 )}
               </CardContent>
@@ -877,14 +877,14 @@ export default function MarketingDashboard() {
 
         {/* LOGS */}
         <TabsContent value="logs" className="space-y-2">
-          {logs.length === 0 && <p className="text-muted-foreground">لا سجلات نشر بعد.</p>}
+          {logs.length === 0 && <p className="text-muted-foreground">No publish logs yet.</p>}
           {logs.map((l) => (
             <Card key={l.id}>
               <CardContent className="p-3 flex items-center justify-between text-sm">
                 <div>
                   <Badge>{l.platform}</Badge>{" "}
                   <Badge variant={l.success ? "default" : "destructive"}>
-                    {l.success ? "نجح" : "فشل"}
+                    {l.success ? "Success" : "Failed"}
                   </Badge>
                   <p className="text-xs text-muted-foreground mt-1">
                     {new Date(l.created_at).toLocaleString("ar")}
@@ -898,7 +898,7 @@ export default function MarketingDashboard() {
                     rel="noreferrer"
                     className="text-xs underline"
                   >
-                    فتح
+                    Open
                   </a>
                 )}
               </CardContent>

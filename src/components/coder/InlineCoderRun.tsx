@@ -79,7 +79,7 @@ export default function InlineCoderRun({ prompt, onClose, onFinish }: Props) {
 
   const handlePreview = async () => {
     if (files.size === 0) {
-      toast.error("لا توجد ملفات بعد");
+      toast.error("No files yet");
       return;
     }
     setPublishing(true);
@@ -156,7 +156,7 @@ export default function InlineCoderRun({ prompt, onClose, onFinish }: Props) {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium text-white capitalize">
-                      اربط {ig.kind === "github" ? "GitHub" : "Supabase"}
+                      Connect {ig.kind === "github" ? "GitHub" : "Supabase"}
                     </div>
                     <div className="text-[10px] text-white/60 truncate">{ig.reason}</div>
                   </div>
@@ -174,7 +174,7 @@ export default function InlineCoderRun({ prompt, onClose, onFinish }: Props) {
                           window.open(url, "_blank");
                         }}
                       >
-                        اربط <ExternalLink className="h-3 w-3 mr-1" />
+                        Connect <ExternalLink className="h-3 w-3 mr-1" />
                       </Button>
                       <Button
                         size="sm"
@@ -182,7 +182,7 @@ export default function InlineCoderRun({ prompt, onClose, onFinish }: Props) {
                         className="h-7 text-xs text-white/70"
                         onClick={() => updateIntegration(ig.kind, "skipped")}
                       >
-                        تخطي
+                        Skip
                       </Button>
                     </>
                   ) : (
@@ -194,7 +194,7 @@ export default function InlineCoderRun({ prompt, onClose, onFinish }: Props) {
                           : "bg-white/10 text-white/50",
                       )}
                     >
-                      {ig.state === "connected" ? "✓ متصل" : "تم التخطي"}
+                      {ig.state === "connected" ? "✓ Connected" : "Skipped"}
                     </span>
                   )}
                 </div>
@@ -206,9 +206,9 @@ export default function InlineCoderRun({ prompt, onClose, onFinish }: Props) {
           <div className="flex gap-1 border-b border-white/10 px-2 py-1.5">
             {(
               [
-                { id: "plan", icon: ListTodo, label: "الخطة", count: todos.length },
-                { id: "files", icon: FileCode, label: "الملفات", count: files.size },
-                { id: "logs", icon: Terminal, label: "السجل", count: bash.length },
+                { id: "plan", icon: ListTodo, label: "Plan", count: todos.length },
+                { id: "files", icon: FileCode, label: "Files", count: files.size },
+                { id: "logs", icon: Terminal, label: "Log", count: bash.length },
               ] as const
             ).map((t) => (
               <button
@@ -290,7 +290,7 @@ export default function InlineCoderRun({ prompt, onClose, onFinish }: Props) {
                       <code>{files.get(selectedFile)}</code>
                     </pre>
                   ) : (
-                    <div className="p-4 text-xs text-white/50">اختر ملف</div>
+                    <div className="p-4 text-xs text-white/50">Choose a file</div>
                   )}
                 </div>
               </div>

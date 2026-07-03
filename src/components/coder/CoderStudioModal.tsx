@@ -305,11 +305,11 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
     if (!selected) return;
     fs.writeFile(selected, buffer);
     setDirty(false);
-    toast.success("تم الحفظ");
+    toast.success("Saved");
   };
 
   const newFile = () => {
-    const name = window.prompt("اسم الملف الجديد (مثال: src/utils/helpers.ts)")?.trim();
+    const name = window.prompt("New file name (e.g. src/utils/helpers.ts)")?.trim();
     if (!name) return;
     fs.writeFile(name, "");
     setSelected(name);
@@ -317,7 +317,7 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
 
   const deleteCurrent = () => {
     if (!selected) return;
-    if (!window.confirm(`حذف ${selected}؟`)) return;
+    if (!window.confirm(`Delete ${selected}?`)) return;
     fs.removeFile(selected);
     setSelected(fs.files.find((f) => f.path !== selected)?.path || "");
   };
@@ -342,10 +342,10 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
         {!filesOnly && (
           <div className="flex items-center gap-1 px-2 sm:px-3 h-11 border-b border-white/10 bg-black/20 overflow-x-auto">
             {([
-              { id: "files", label: "الملفات", icon: FolderTree },
-              { id: "terminal", label: "التيرمينال", icon: TerminalIcon },
+              { id: "files", label: "Files", icon: FolderTree },
+              { id: "terminal", label: "Terminal", icon: TerminalIcon },
               { id: "python", label: "Python", icon: FileCode2 },
-              { id: "integrations", label: "الربط", icon: Plug },
+              { id: "integrations", label: "Integrations", icon: Plug },
             ] as { id: Tab; label: string; icon: any }[]).map((t) => (
               <button
                 key={t.id}
@@ -369,10 +369,10 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                 <div className="flex items-center justify-between px-3 h-9 border-b border-white/10">
                   <span className="text-[11px] uppercase tracking-wider text-white/50">Files</span>
                   <div className="flex items-center gap-1">
-                    <button onClick={newFile} className="p-1 rounded hover:bg-white/10 text-white/70" title="جديد">
+                    <button onClick={newFile} className="p-1 rounded hover:bg-white/10 text-white/70" title="New">
                       <Plus className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={deleteCurrent} className="p-1 rounded hover:bg-white/10 text-white/70" title="حذف">
+                    <button onClick={deleteCurrent} className="p-1 rounded hover:bg-white/10 text-white/70" title="Delete">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -391,7 +391,7 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                     </button>
                   ))}
                   {!fs.files.length && (
-                    <div className="px-3 py-4 text-[12px] text-white/40">لا توجد ملفات</div>
+                    <div className="px-3 py-4 text-[12px] text-white/40">No files</div>
                   )}
                 </div>
               </aside>
@@ -403,7 +403,7 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                     disabled={!dirty}
                     className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md text-[11.5px] font-medium bg-white text-black disabled:opacity-40"
                   >
-                    <Save className="w-3.5 h-3.5" /> حفظ
+                    <Save className="w-3.5 h-3.5" /> Save
                   </button>
                 </div>
                 <textarea
@@ -412,7 +412,7 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                   spellCheck={false}
                   dir="ltr"
                   className="flex-1 w-full bg-[#0b0b0f] text-white/90 font-mono text-[12.5px] leading-relaxed p-3 outline-none resize-none"
-                  placeholder="اختر ملف لبدء التحرير…"
+                  placeholder="Choose a file to start editing…"
                 />
               </section>
             </div>
@@ -447,7 +447,7 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                   autoFocus
                   spellCheck={false}
                   className="flex-1 bg-transparent outline-none text-white/90 font-mono text-[12.5px]"
-                  placeholder="اكتب أمرًا… (help)"
+                  placeholder="Type a command… (help)"
                 />
               </form>
             </div>
@@ -458,7 +458,7 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
               <div className="flex items-center justify-between px-3 h-10 border-b border-white/10 bg-black/40">
                 <div className="flex items-center gap-2 text-[12px] text-white/70">
                   <FileCode2 className="w-3.5 h-3.5" />
-                  Python 3 (Pyodide) — يعمل داخل المتصفح
+                  Python 3 (Pyodide) — runs in the browser
                   {pyReady === "loading" && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   {pyReady === "ready" && <Check className="w-3.5 h-3.5 text-emerald-400" />}
                 </div>
@@ -468,7 +468,7 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                   className="inline-flex items-center gap-1.5 h-7 px-3 rounded-md text-[12px] font-semibold bg-emerald-500 text-black disabled:opacity-50"
                 >
                   {pyRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" fill="currentColor" />}
-                  تشغيل
+                  Run
                 </button>
               </div>
               <div className="flex-1 grid grid-rows-2 min-h-0">
@@ -482,7 +482,7 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                 <pre
                   dir="ltr"
                   className="w-full h-full overflow-auto bg-black/60 text-white/80 font-mono text-[12px] leading-relaxed p-3 whitespace-pre-wrap"
-                >{pyOut || "// اضغط تشغيل لعرض النتائج"}</pre>
+                >{pyOut || "// Press Run to see results"}</pre>
               </div>
             </div>
           )}
@@ -490,10 +490,10 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
           {tab === "integrations" && (
             <div className="h-full overflow-y-auto p-6">
               <div className="max-w-2xl mx-auto space-y-4">
-                <h3 className="text-white text-lg font-bold">ربط الأدوات الخارجية</h3>
+                <h3 className="text-white text-lg font-bold">Connect external tools</h3>
                 <p className="text-white/60 text-[13px]">
-                  اربط GitHub لدفع الكود، أو Supabase لتشغيل قاعدة البيانات — أو تخطَّ الخطوة وابدأ فورًا.
-                  الذكاء الاصطناعي يستطيع أيضًا تخطي الربط تلقائيًا إذا لم يكن ضروريًا للمشروع.
+                  Connect GitHub to push code, or Supabase to run the database — or skip and start right away.
+                  The AI can also skip the integration automatically if not needed for this project.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
@@ -504,8 +504,8 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                       <Github className="w-5 h-5" />
                     </span>
                     <span className="flex-1 min-w-0">
-                      <span className="block text-white text-[14px] font-semibold">ربط GitHub</span>
-                      <span className="block text-white/60 text-[12px]">دفع الكود وإدارة المستودعات</span>
+                      <span className="block text-white text-[14px] font-semibold">Connect GitHub</span>
+                      <span className="block text-white/60 text-[12px]">Push code and manage repos</span>
                     </span>
                   </button>
                   <button
@@ -516,16 +516,16 @@ const CoderStudioModal = ({ open, onClose, initialFiles, filesOnly }: Props) => 
                       S
                     </span>
                     <span className="flex-1 min-w-0">
-                      <span className="block text-white text-[14px] font-semibold">ربط Supabase</span>
-                      <span className="block text-white/60 text-[12px]">قاعدة بيانات، مصادقة، وتخزين</span>
+                      <span className="block text-white text-[14px] font-semibold">Connect Supabase</span>
+                      <span className="block text-white/60 text-[12px]">Database, auth, and storage</span>
                     </span>
                   </button>
                 </div>
                 <button
-                  onClick={() => { toast.success("تم التخطي — يمكنك المتابعة بدون ربط"); setTab("files"); }}
+                  onClick={() => { toast.success("Skipped — you can continue without connecting"); setTab("files"); }}
                   className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-2xl border border-white/15 bg-transparent hover:bg-white/5 text-white/80 text-[13px] font-medium"
                 >
-                  <SkipForward className="w-4 h-4" /> تخطي وابدأ الآن
+                  <SkipForward className="w-4 h-4" /> Skip and start now
                 </button>
               </div>
             </div>
