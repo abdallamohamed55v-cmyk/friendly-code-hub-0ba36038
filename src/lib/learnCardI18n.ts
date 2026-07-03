@@ -109,7 +109,25 @@ export type LearnStrings = {
   }) => string;
   on_correct_continue: string;
   on_wrong_simplify: string;
+  // ── new card types ──
+  flashcard_label: string;
+  flashcard_flip: string;
+  flashcard_knew: string;
+  flashcard_almost: string;
+  flashcard_didnt: string;
+  ordering_label: string;
+  ordering_hint: string;
+  ordering_check: string;
+  ordering_all_right: string;
+  ordering_some_wrong: string;
+  summary_label: string;
+  summary_placeholder: string;
+  summary_submit: string;
+  scenario_label: string;
+  scenario_outcome: string;
+  scenario_best_choice: string;
 };
+
 
 const en: LearnStrings = {
   question_choose: "Question — choose the answer",
