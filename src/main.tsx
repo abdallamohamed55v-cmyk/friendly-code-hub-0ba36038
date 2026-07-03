@@ -20,7 +20,9 @@ import { toast as sonnerToast } from "sonner";
 import { patchSupabaseAuth } from "@/integrations/supabase/patchAuth";
 import { installGlobalLinkPrefetch } from "@/lib/globalLinkPrefetch";
 import { installThemeColorSync } from "@/lib/themeColorSync";
+import { installViewTransitions } from "@/lib/installViewTransitions";
 import { registerAppServiceWorker } from "@/lib/registerSW";
+
 
 // If Vercel ever serves the static 404 fallback before SPA rewrites apply,
 // public/404.html redirects here with the original path encoded. Restore it
