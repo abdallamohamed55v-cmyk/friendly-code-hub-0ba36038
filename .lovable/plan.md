@@ -1,115 +1,55 @@
-## هدف الخطة
-نجعل وضع التعليم في Megsy الأفضل بالعالم — أكثر ذكاءً، أنعم تفاعلاً، أوضح تعليمياً، وأشمل لكل الأعمار والمجالات — بدون تغيير أي منطق تجاري خارج وضع التعليم.
+# خطة إكمال وضع التعليم — الأفضل في العالم
 
-## 1) Audit سريع للوضع الحالي (اللي طلعت فيه ثغرات)
+الأساس (التتبع + HUD + تكيّف الذكاء الحيّ) تم بناؤه. باقي الطبقات الإبداعية التي ستقفل الملف نهائياً:
 
-**نقاط قوة موجودة:** 17 نوع بطاقة (mcq, multi, truefalse, fill, match, checkin, mermaid, roadmap, exam, photo_solve, onboarding, flashcard, ordering, summary_write, scenario…)، tone system، RTL awareness، i18n EN/AR، `LEARNING_PROMPT` مطوّر بـ UDL + Bloom + domain rules.
+## 1. اللمسات التفاعلية (LearnCard.tsx)
+- **Laddered Hints**: 3 مستويات (تلميح خفيف → تلميح أقوى → كشف جزئي) قبل إظهار الإجابة، مع خصم XP تدريجي.
+- **Confetti + streak celebration**: انفجار CSS خفيف عند streak ≥ 3، وشارة "🔥 3 in a row!" متحركة.
+- **Haptic موحّد**: نبضة قصيرة للصح، مزدوجة للخطأ، ثلاثية لترقية Bloom.
+- **Skip / Bookmark / Report**: أزرار صغيرة أعلى كل بطاقة (bookmark يحفظ في localStorage للمراجعة).
+- **Keyboard shortcuts**: أرقام 1-4 للـ MCQ، Enter للتأكيد، H للتلميح، S للتخطي.
+- **`prefers-reduced-motion`**: احترام الإعداد في كل spring/framer-motion.
+- **RTL sweep**: مراجعة كل padding/margin/flex-direction للعربية.
 
-**ثغرات فعلية رصدناها:**
-- **لا يوجد تتبع تقدم**: streak/XP/Bloom rung ما بيتحفظش، فالـ AI ما بيقدرش يكيّف حقيقة (adaptive بس نظرياً في الـ prompt).
-- **لا يوجد HUD**: المستخدم مش شايف مستواه، وقته، عدد الأسئلة الصح متتالياً، ولا الموضوع الحالي.
-- **لا فيدباك حسي متسق**: haptic بس على flashcard، مفيش صوت اختياري ولا confetti على streak.
-- **Hints غير متدرجة**: الإجابة بتظهر فوراً أو مش بتظهر، مفيش سلم (nudge → hint → reveal).
-- **Explain بيظهر ثابت**: مش بيتوسّع بأنيميشن ولا بيتلوّن حسب صح/غلط.
-- **Parser مسامحته محدودة**: لو الـ AI بعت `answer` بدل `correct`، أو `question_text` بدل `question`، بيسقط. مفيش fallback مرئي لما JSON يتكسر (البلوك بيختفي بصمت).
-- **مفيش أنواع مطلوبة للعالمية**: `audio_listen` (لغات)، `hotspot` (تشريح/خرائط)، `code_run` (برمجة)، `poll` (فصول)، `drawing` (أطفال/رياضيات).
-- **Exam runner ما بيحفظش الإجابات محلياً** → لو reload الطالب يخسر كل حاجة.
-- **مفيش Focus Mode** يخفي الشات ويسيب البطاقة بس.
-- **`LEARNING_PROMPT` طويل بس مش بيتلقى إشارات تقدم حقيقية** من الفرونت (streak, level) عشان يكيّف صح.
-- **A11y**: keyboard كامل بس لـ MCQ. flashcard/ordering/scenario محتاجين arrow-key + space/enter.
-- **`prefers-reduced-motion`**: مش محترم في spring animations.
-- **Mobile targets**: بعض الأزرار الفرعية (skip/report) أصغر من 44px.
+## 2. بطاقات جديدة عالمية (learnCardParser.ts + LearnCard.tsx + i18n)
+- `hotspot`: صورة + نقاط قابلة للنقر (تشريح، خرائط، مخططات).
+- `audio_listen`: تشغيل مقطع + سؤال (لغات، موسيقى، طب سمع).
+- `code_run`: قصاصة كود + توقّع الناتج (برمجة).
+- `poll`: استطلاع بلا "إجابة صحيحة" لبناء الحدس قبل الشرح.
+- `drawing`: canvas صغير للرسم (رياضيات، هندسة، أطفال).
 
-## 2) خطة التنفيذ (7 خطوات، مرتبة حسب الأثر)
+## 3. Focus Mode (ملف جديد `src/components/learn/FocusMode.tsx`)
+- Wrapper يخفي الشات ويعرض البطاقة ملء الشاشة.
+- Pomodoro مدمج (25/5) مع صوت خفيف اختياري.
+- Auto-save كل 10 ثواني.
+- زر خروج واضح + ملخّص جلسة عند الإغلاق (XP اكتُسب، Bloom, دقّة).
 
-### الخطوة 1 — نظام تقدم حقيقي (Persistence Layer)
-**ملف جديد:** `src/lib/studyProgress.ts`
-- `getProgress(topic)` / `saveProgress(topic, {streak, xp, bloomRung, correctInRow, lastSeenAt, cardsAnswered})`
-- تخزين في `localStorage` تحت `megsy:study:v1`
-- API لتصدير آخر جلسة (`getRecentSessions`) لعرضها في HUD.
-- helpers: `bumpXP`, `bumpStreak`, `resetStreak`, `promoteBloom`, `demoteBloom`.
+## 4. Exam / Session Persistence (useStudyMode.ts + جديد `examSession.ts`)
+- حفظ إجابات الامتحان في localStorage (يعود بعد reload).
+- Mini-map للتنقّل بين الأسئلة.
+- شاشة نتائج نهائية: Bloom breakdown + خطة مراجعة مخصصة ("راجع 3 بطاقات على Apply").
 
-### الخطوة 2 — StudyHUD ثابت أعلى وضع التعليم
-**ملف جديد:** `src/components/learn/StudyHUD.tsx`
-- شريط علوي رفيع (يظهر بس لما `mode === "learning"`)، بيعرض:
-  - الموضوع الحالي (يُستنتج من آخر checkin/onboarding).
-  - Streak 🔥 + XP ⭐ + Bloom rung (Remember → Create).
-  - Timer (Pomodoro مدمج من `InChatTimerCard`).
-  - زر Focus Mode (يخفي السايدبار ويكبّر البطاقة).
-  - زر "استراحة 5د" (يبدأ Pomodoro break تلقائي).
-- Mount من `ChatMessagesList` أو `ChatPage` جنب المود لما يكون Learning.
-- respects `prefers-reduced-motion`.
+## 5. تعميق ذكاء الردود (modelSystemPrompts.ts)
+- قواعد صارمة ضد التكرار (لا 3 بطاقات من نفس النوع متتالية).
+- تفصيل حسب الفئة العمرية: حضانة (رموز + صور) / مدرسة (أمثلة ملموسة) / جامعة (برهان) / محترف (case studies).
+- قواعد عميقة لكل مجال: طب (تحذيرات سلامة)، قانون (اختصاص قضائي)، برمجة (اقرأ→توقّع→اكتب)، رياضيات (ملموس→رمزي)، لغات (استماع→تكرار→إنتاج).
+- تدفّق إجباري: `onboarding` → 3-5 بطاقات → `summary_write` (Feynman) → `exam` قصير.
+- قراءة `[LEARN_STATE]` بدقّة: streak عالٍ = صعّب، accuracy < 50% = انزل رتبة Bloom + اشرح من جديد.
+- lang lock: التزم بلهجة المستخدم بالضبط (مصري → مصري، MSA → MSA).
 
-### الخطوة 3 — تلميع LearnCard.tsx (Micro-interactions + A11y)
-- **Haptic feedback موحد**: كل tap صح → `navigator.vibrate(8)`، غلط → `[8,40,8]`.
-- **Confetti spring على streak ≥ 3**: مكوّن خفيف بدون مكتبة (particles CSS).
-- **Explain animation**: `height: auto` spring + لون حسب صح/غلط.
-- **Hints laddered**: زر 💡 يفتح 3 مستويات: nudge → hint → answer path (بيقلّل XP لو استُخدم).
-- **Skip / Bookmark / Report**: أزرار مدمجة أسفل كل بطاقة (44px+).
-- **Keyboard كامل**: arrow keys لـ flashcard/ordering/scenario، space=flip، enter=submit.
-- **`prefers-reduced-motion`**: يوقف spring، يستبدل بـ fade خفيف.
-- **RTL sweep**: استبدال أي `ml-/mr-/left-/right-` بـ `ms-/me-/start-/end-`.
+## 6. Micro-polish
+- ConfettiBurst مكوّن مشترك (`src/components/common/ConfettiBurst.tsx`).
+- StudyHUD: زر reset بتأكيد، عرض topic كـ chip قابل للتعديل.
+- InChatTimerCard: مزامنة مع Pomodoro في Focus Mode.
+- Sounds اختياريّة (toggle في HUD): tick, correct, wrong, level-up (استخدام Web Audio بلا ملفات).
 
-### الخطوة 4 — Parser أقوى + أنواع جديدة
-**ملف:** `src/lib/learnCardParser.ts`
-- تسامح أوسع: يقبل `answer|correct_answer|correctIndex|correct_option` كـ `correct`، و `question_text|prompt|q` كـ `question`.
-- Fallback مرئي: لو JSON مكسور، بدل ما البلوك يختفي، يظهر بطاقة "⚠️ سؤال ما وصلش صح — تخطى" مع زر retry.
-- إضافة الأنواع الجديدة:
-  - `hotspot` — صورة/دياجرام + نقاط قابلة للضغط (تشريح، خرائط، UI).
-  - `audio_listen` — رابط صوت + سؤال (تعلّم لغات، music theory).
-  - `code_run` — بلوك كود صغير + expected output (يستخدم sandbox موجود).
-  - `poll` — تصويت جماعي بسيط (للفصول والاستطلاعات).
-- زوّد `learnCardI18n.ts` بنصوص EN/AR للأنواع دي.
+## Details التقنية
+- كل ملف جديد يبدأ بـ `/** @doc ... */`.
+- typecheck: `bunx tsgo --noEmit` بعد كل خطوة.
+- لا تغيير في backend/auth/DB — كل شيء frontend + localStorage.
+- Framer Motion موجود؛ Confetti: CSS keyframes خفيفة بلا مكتبة جديدة.
+- Web Audio API للأصوات (بلا assets إضافية).
 
-### الخطوة 5 — Exam Runner محترف
-- حفظ الإجابات في `localStorage` لحظة بلحظة (key = examId).
-- Mini-map جانبي: كل سؤال دائرة (فارغ/متجاوَب/متعلّم عليه).
-- مراجعة نهائية قبل التسليم.
-- Post-exam: توزيع علامات على Bloom levels + توصية "راجع X" + زر "أنشئ خطة مراجعة" يبعت prompt جاهز للـ AI.
+**الترتيب المقترح:** 1 → 6 → 3 → 2 → 4 → 5 (اللمسات أولاً لأنها الأكثر شعوراً، ثم البطاقات الجديدة، ثم تعميق البرومبت).
 
-### الخطوة 6 — LEARNING_PROMPT الأذكى بالعالم
-**ملف:** `src/lib/modelSystemPrompts.ts`
-- إضافة قوالب JSON للأنواع الجديدة (hotspot/audio/code/poll).
-- **تنوع مقصود**: قاعدة صريحة "لا تكرّر نفس النوع 3 مرات متتالية".
-- **قراءة إشارات التقدم**: الفرونت هيبعت للـ AI header hidden بـ `[LEARN_STATE] streak=3 xp=120 rung=Apply topic="React hooks"` — نضيف قاعدة في الـ prompt يقرأها ويكيّف.
-- **قواعد فئات عمرية أوضح** (preschool/school/university/pro) + templates لكل واحدة.
-- **قواعد مجالات أعمق**: طب (safety disclaimer إجباري)، قانون (jurisdiction disclaimer)، برمجة (read→predict→write)، لغات (i+1 input)، رياضيات (concrete→visual→symbolic)، دين (respect + sources)، فنون (create+critique).
-- **افتتاح إجباري بـ `onboarding` أو `checkin`**، إغلاق إجباري بـ `summary_write` + خطة اليوم التالي.
-- **Growth mindset language**: قاعدة صريحة (praise process، ممنوع "أنت ذكي").
-
-### الخطوة 7 — Focus Mode + Session Shell
-- زر Focus في HUD → يخفي `sidebar` + `composer` الجانبي، يعرض البطاقة full-height مع swipe للتالي.
-- Pomodoro مدمج (25/5) مع toggle sound.
-- Auto-save session state كل 10 ثواني.
-
-## 3) التحقق (Verify)
-- `bunx tsgo --noEmit` + build.
-- Playwright screenshot لكل نوع بطاقة (mcq, multi, match, exam, flashcard, ordering, summary, scenario, hotspot, audio, code, poll) على mobile + desktop، LTR + RTL.
-- اختبار keyboard-only لكل نوع.
-- اختبار `prefers-reduced-motion` (DevTools emulation).
-- اختبار reload أثناء exam → الإجابات محفوظة.
-
-## الملفات (تفاصيل تقنية)
-
-**جديد:**
-- `src/lib/studyProgress.ts` — persistence layer
-- `src/components/learn/StudyHUD.tsx` — شريط علوي
-- `src/components/learn/FocusMode.tsx` — full-screen wrapper
-- `src/components/learn/ConfettiBurst.tsx` — CSS particles خفيف
-
-**تعديل:**
-- `src/lib/learnCardParser.ts` — أنواع جديدة + normalize أقوى + fallback
-- `src/lib/learnCardI18n.ts` — نصوص للأنواع الجديدة
-- `src/components/learn/LearnCard.tsx` — micro-interactions + a11y + hints + hotspot/audio/code/poll renderers
-- `src/components/learn/InChatTimerCard.tsx` — pause/resume/sound toggle
-- `src/lib/modelSystemPrompts.ts` — LEARNING_PROMPT مطوّر + قراءة LEARN_STATE
-- `src/pages/chat/hooks/useStudyMode.ts` — يستهلك `studyProgress` ويحقن `LEARN_STATE` في الرسائل
-- `src/pages/chat/components/ChatMessagesList.tsx` — mount StudyHUD في learning mode
-- `src/pages/chat/services/runChatStreamTurn.ts` — حقن `[LEARN_STATE]` header
-
-## نطاق الأمان
-- كل التعديلات داخل وضع التعليم فقط.
-- ما نلمسش auth/billing/backend business logic.
-- ما نضيفش dependencies جديدة (بنستخدم framer-motion الموجود + CSS particles بدل canvas-confetti).
-
-هل نبدأ التنفيذ بالخطوة 1 → 7 بالترتيب؟
+هل أبدأ التنفيذ بالترتيب أعلاه؟
