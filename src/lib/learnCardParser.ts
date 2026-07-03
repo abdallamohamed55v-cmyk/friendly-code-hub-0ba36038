@@ -119,7 +119,9 @@ function normalizeCard(obj: any): any {
   return obj;
 }
 
+function tryParseCard(raw: string): LearnCardData | null {
   try {
+
     const obj = normalizeCard(JSON.parse(raw.trim()));
     if (!obj || typeof obj !== "object") return null;
     if (typeof obj.type === "string" && KNOWN_TYPES.has(obj.type)) {
