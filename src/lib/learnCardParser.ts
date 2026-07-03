@@ -21,7 +21,12 @@ export type LearnCardType =
   | "exam_setup"
   | "exam_runner"
   | "photo_solve"
-  | "onboarding";
+  | "onboarding"
+  // ── new world-class card types ──
+  | "flashcard"      // spaced-repetition flip card (fact-dense recall)
+  | "ordering"       // put steps/events in the right order
+  | "summary_write"  // Feynman "teach it back in your words"
+  | "scenario";      // branching case: medicine, law, ethics, languages
 
 export interface LearnCardData {
   type: LearnCardType;
@@ -48,7 +53,12 @@ const KNOWN_TYPES = new Set<string>([
   "exam_runner",
   "photo_solve",
   "onboarding",
+  "flashcard",
+  "ordering",
+  "summary_write",
+  "scenario",
 ]);
+
 
 // Normalize options so the UI always receives an array of plain strings.
 // Some models emit options as { text, correct } / { label, is_correct } / etc.
