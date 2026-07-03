@@ -191,7 +191,6 @@ export function noteHintUsed(): void {
  */
 export function formatStudyStateForPrompt(): string | null {
   const s = safeRead();
-  if (s.cardsAnswered === 0 && !s.topic) return null;
   const parts: string[] = [];
   parts.push(`streak=${s.streak}`);
   parts.push(`best_streak=${s.bestStreak}`);
@@ -202,7 +201,25 @@ export function formatStudyStateForPrompt(): string | null {
     s.cardsAnswered > 0 ? Math.round((s.cardsCorrect / s.cardsAnswered) * 100) : 0;
   parts.push(`accuracy=${accuracy}%`);
   if (s.topic) parts.push(`topic="${s.topic.replace(/"/g, '\\"')}"`);
-  return `[LEARN_STATE] ${parts.join(" ")}`;
+  const stateLine = `[LEARN_STATE] ${parts.join(" ")}`;
+
+  // Append durable long-term memory (due reviews + recent misconceptions)
+  // when available — this is what makes the tutor feel like it *remembers*
+  // the learner across turns and sessions.
+  let memoryBlock: string | null = null;
+  try {
+    // Sync import via require-style is not available in ESM; use dynamic-import
+    // synchronously by touching the module the caller has already loaded.
+    // We fall back gracefully if the module isn't in the graph yet.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+    const mem = (globalThis as any).__megsyLearnMemory;
+    if (mem && typeof mem.formatMemoryForPrompt === "function") {
+      memoryBlock = mem.formatMemoryForPrompt();
+    }
+  } catch { /* noop */ }
+
+  if (s.cardsAnswered === 0 && !s.topic && !memoryBlock) return null;
+  return memoryBlock ? `${stateLine}\n${memoryBlock}` : stateLine;
 }
 
 /** React-friendly subscribe helper. Fires on every write from any tab. */
