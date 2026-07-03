@@ -3,8 +3,30 @@ import { m as motion, AnimatePresence } from "framer-motion";
 import { ArrowUp, Check, ChevronRight, Flame, Lightbulb, Sparkles, X } from "lucide-react";
 import type { LearnCardData } from "@/lib/learnCardParser";
 import { detectLearnLocale, getLearnStrings, type LearnLocale } from "@/lib/learnCardI18n";
-import { recordAnswer, hapticFeedback, setStudyTopic } from "@/lib/studyProgress";
+import { recordAnswer, hapticFeedback, setStudyTopic, getStudyState } from "@/lib/studyProgress";
+import { logItem, logMistake, hashCardKey, noteTopicVisit } from "@/lib/learnMemory";
 import { ConfettiBurst } from "@/components/common/ConfettiBurst";
+
+// Stable key per rendered card — used to dedupe answers across React
+// re-renders and stream resumes, and to key mistakes/items in memory.
+function cardKey(card: any): string {
+  const raw =
+    (card && (card.id || card.uid || card.key)) ||
+    JSON.stringify({
+      t: card?.type,
+      q: card?.question || card?.title || card?.problem || card?.front,
+      o: card?.options,
+      c: card?.correct,
+    });
+  return hashCardKey(String(raw));
+}
+
+// Resolve topic for memory logging: prefer card.topic, else the
+// session's tracked topic. Empty string when unknown.
+function cardTopic(card: any): string {
+  const t = card?.topic || card?.subject || getStudyState().topic || "";
+  return String(t || "").trim();
+}
 
 /* ============================================================
  * Learn Mode — refined card system
