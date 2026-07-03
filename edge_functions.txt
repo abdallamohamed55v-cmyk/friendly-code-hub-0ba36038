@@ -1,0 +1,11 @@
+chat-alibaba
+chat-slides-stream
+deep-research-job
+docs-generate
+kimi-coder
+media-image
+media-video-poll
+media-video
+slides-api
+slides-export-pptx
+telegram-tasks-bot
