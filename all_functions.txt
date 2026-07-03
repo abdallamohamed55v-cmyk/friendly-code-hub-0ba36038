@@ -1,0 +1,12 @@
+supabase/functions/_shared
+supabase/functions/chat-alibaba
+supabase/functions/chat-slides-stream
+supabase/functions/deep-research-job
+supabase/functions/docs-generate
+supabase/functions/kimi-coder
+supabase/functions/media-image
+supabase/functions/media-video-poll
+supabase/functions/media-video
+supabase/functions/slides-api
+supabase/functions/slides-export-pptx
+supabase/functions/telegram-tasks-bot
