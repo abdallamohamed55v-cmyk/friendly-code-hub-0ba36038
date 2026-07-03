@@ -5,6 +5,8 @@ import "./index.css";
 import "./styles/claude-chat.css";
 import "./styles/settings-amber.css";
 import "./styles/pwa-safe-area.css";
+import "./styles/pwa-responsive.css";
+
 
 // All fonts are loaded via Google Fonts <link> in index.html (Space Grotesk,
 // DM Sans, Work Sans, Inter, Instrument Serif, Noto Serif Arabic, Cairo,

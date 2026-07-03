@@ -1,0 +1,121 @@
+/** @doc Fluid typography, spacing, touch and standalone-mode helpers for PWA sizing. */
+
+/* ============================================================
+   Fluid Type & Spacing Scale (Utopia-inspired)
+   Uses clamp() so text/spacing grow smoothly between phones and desktop
+   without breakpoint jumps. Consume via var(--step-*) / var(--space-*).
+   ============================================================ */
+:root {
+  --step--2: clamp(0.694rem, 0.66rem + 0.17vw, 0.79rem);
+  --step--1: clamp(0.833rem, 0.79rem + 0.22vw, 0.94rem);
+  --step-0:  clamp(1rem, 0.94rem + 0.3vw, 1.125rem);
+  --step-1:  clamp(1.2rem, 1.12rem + 0.4vw, 1.42rem);
+  --step-2:  clamp(1.44rem, 1.32rem + 0.6vw, 1.8rem);
+  --step-3:  clamp(1.728rem, 1.55rem + 0.9vw, 2.28rem);
+  --step-4:  clamp(2.074rem, 1.8rem + 1.35vw, 2.88rem);
+  --step-5:  clamp(2.488rem, 2.1rem + 1.95vw, 3.65rem);
+
+  --space-3xs: clamp(0.25rem, 0.22rem + 0.15vw, 0.35rem);
+  --space-2xs: clamp(0.5rem,  0.45rem + 0.25vw, 0.65rem);
+  --space-xs:  clamp(0.75rem, 0.68rem + 0.35vw, 1rem);
+  --space-s:   clamp(1rem,    0.9rem + 0.5vw,  1.35rem);
+  --space-m:   clamp(1.5rem,  1.35rem + 0.75vw, 2rem);
+  --space-l:   clamp(2rem,    1.8rem + 1vw,    2.7rem);
+  --space-xl:  clamp(3rem,    2.7rem + 1.5vw,  4rem);
+  --space-2xl: clamp(4rem,    3.6rem + 2vw,    5.4rem);
+}
+
+/* ============================================================
+   Content container — fluid width, safe gutters, always centered.
+   Use: <div class="container-fluid">
+   ============================================================ */
+.container-fluid {
+  width: min(100% - 2rem, 1200px);
+  margin-inline: auto;
+}
+
+/* ============================================================
+   RAM grid — responsive without media queries.
+   Use: <div class="auto-grid">
+   ============================================================ */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: var(--space-s);
+}
+
+/* ============================================================
+   Container-query surfaces. Wrap a component in .cq to let it react
+   to its parent's width rather than the whole viewport.
+   ============================================================ */
+.cq { container-type: inline-size; }
+
+/* ============================================================
+   Touch target minimums — WCAG 2.2 + Apple HIG.
+   Applied only on coarse pointers so mouse users keep tight UI.
+   ============================================================ */
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  a.btn,
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Only run hover styles when the device really supports hover.
+   Consumers can opt in with .hover-safe:hover { ... }. */
+@media (hover: none) {
+  .hover-only { display: none !important; }
+}
+
+/* ============================================================
+   Reduced motion — respect OS preference globally.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   iOS tap-highlight + text auto-resize cleanup.
+   ============================================================ */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent flex/grid children from overflowing long strings. */
+.min-w-0 { min-width: 0; }
+
+/* Aspect helpers for media */
+.aspect-video  { aspect-ratio: 16 / 9; }
+.aspect-square { aspect-ratio: 1 / 1; }
+.aspect-photo  { aspect-ratio: 4 / 3; }
+.media-cover   { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ============================================================
+   Standalone (installed PWA) — kill bounce & pull-to-refresh
+   but keep inner scroll containers bouncy for good UX.
+   ============================================================ */
+@media all and (display-mode: standalone),
+       all and (display-mode: fullscreen) {
+  html {
+    overscroll-behavior: none;
+  }
+  body {
+    overscroll-behavior-y: contain;
+  }
+  .scroll-area {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
