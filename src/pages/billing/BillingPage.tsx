@@ -138,6 +138,17 @@ const BillingPage = () => {
         </div>
       </SubSection>
 
+      {isMenaUser() && (
+        <SubSection
+          title="طرق دفع محلية"
+          description="ادفع بالجنيه المصري أو ريال أو درهم عبر كاشير — يدعم كل البطاقات وفودافون كاش."
+        >
+          <KashierTopUp />
+        </SubSection>
+      )}
+
+
+
       <SubSection
         title="Recent activity"
         description={`${transactions.length} entries — every top-up, reward and deduction is logged.`}
