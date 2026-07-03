@@ -41,7 +41,9 @@ import { registerAppServiceWorker } from "@/lib/registerSW";
 patchSupabaseAuth();
 installGlobalLinkPrefetch();
 installThemeColorSync();
+installViewTransitions();
 registerAppServiceWorker();
+
 
 // Globally sanitize every toast message so we never leak provider names or
 // the raw "Edge Function returned a non-2xx status code" string to users.
