@@ -126,6 +126,12 @@ export type LearnStrings = {
   scenario_label: string;
   scenario_outcome: string;
   scenario_best_choice: string;
+  // ── laddered hints + streak celebration ──
+  hint_use: string;
+  hint_first_letter: string;
+  hint_generic: string;
+  hint_eliminated: string;
+  streak_badge: (n: number) => string;
 };
 
 
@@ -215,6 +221,11 @@ const en: LearnStrings = {
   scenario_label: "Real scenario — choose your next move",
   scenario_outcome: "What happens next",
   scenario_best_choice: "Best choice",
+  hint_use: "Hint",
+  hint_first_letter: "Starts with",
+  hint_generic: "Think about the definition you just read",
+  hint_eliminated: "One wrong option was crossed out",
+  streak_badge: (n) => `${n} in a row!`,
 };
 
 
@@ -303,6 +314,11 @@ const ar: LearnStrings = {
   scenario_label: "سيناريو حقيقي — اختار خطوتك",
   scenario_outcome: "اللي هيحصل بعدها",
   scenario_best_choice: "الاختيار الأفضل",
+  hint_use: "تلميح",
+  hint_first_letter: "يبدأ بـ",
+  hint_generic: "فكّر في التعريف اللي قريته دلوقتي",
+  hint_eliminated: "اتشطب اختيار واحد غلط",
+  streak_badge: (n) => `${n} صح ورا بعض!`,
 };
 
 

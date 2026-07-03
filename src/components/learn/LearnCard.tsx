@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { m as motion, AnimatePresence } from "framer-motion";
-import { ArrowUp, Check, ChevronRight, Sparkles, X } from "lucide-react";
+import { ArrowUp, Check, ChevronRight, Flame, Lightbulb, Sparkles, X } from "lucide-react";
 import type { LearnCardData } from "@/lib/learnCardParser";
 import { detectLearnLocale, getLearnStrings, type LearnLocale } from "@/lib/learnCardI18n";
 import { recordAnswer, hapticFeedback, setStudyTopic } from "@/lib/studyProgress";
+import { ConfettiBurst } from "@/components/common/ConfettiBurst";
 
 /* ============================================================
  * Learn Mode — refined card system
@@ -252,12 +253,35 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
   const loc = localeFromCard(card);
   const tt = getLearnStrings(loc);
   const [picked, setPicked] = useState<number | null>(null);
+  const [hintLevel, setHintLevel] = useState<0 | 1 | 2>(0);
+  const [confettiKey, setConfettiKey] = useState(0);
+  const [streakBadge, setStreakBadge] = useState<number | null>(null);
   const correct = card.correct as number;
   const isRight = picked === correct;
   const options = card.options || [];
 
+  // Ladder of hints: level 1 = nudge (from card.hint or generic), level 2 =
+  // eliminate one wrong option. Level 3 (reveal) is baked into "picked".
+  // The hint text is either provided by the tutor via card.hint / card.hints[]
+  // or synthesized from the correct option's first characters.
+  const hint1 = useMemo(() => {
+    if (typeof card.hint === "string" && card.hint.trim()) return card.hint.trim();
+    if (Array.isArray(card.hints) && card.hints[0]) return String(card.hints[0]);
+    const target = options[correct] ?? "";
+    return target ? `${tt.hint_first_letter}: "${target.slice(0, 2)}…"` : tt.hint_generic;
+  }, [card.hint, card.hints, options, correct, tt]);
+  const eliminated = useMemo(() => {
+    if (hintLevel < 2) return new Set<number>();
+    // Eliminate one wrong option (deterministic pick: first non-correct).
+    const wrong = options
+      .map((_: string, i: number) => i)
+      .filter((i: number) => i !== correct);
+    return new Set<number>(wrong.slice(0, 1));
+  }, [hintLevel, options, correct]);
+
   const submit = (i: number) => {
     if (picked !== null) return;
+    if (eliminated.has(i)) return;
     setPicked(i);
     const chosenLetter = String.fromCharCode(65 + i);
     const correctLetter = String.fromCharCode(65 + (correct as number));
@@ -265,20 +289,47 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
     const wasRight = i === correct;
     // Feed the live-learner signal + haptic — this is what powers the
     // StudyHUD and the [LEARN_STATE] block sent to the tutor next turn.
-    recordAnswer({ correct: wasRight, cardType: "mcq" });
+    // hintLevel is folded in so XP is fairly taxed for each rung used.
+    const nextState = recordAnswer({
+      correct: wasRight,
+      cardType: "mcq",
+      hintLevel: hintLevel as 0 | 1 | 2,
+    });
     hapticFeedback(wasRight ? "correct" : "wrong");
+    // Celebrate: fire confetti on any streak milestone (3, 5, 10, 20…).
+    if (wasRight && nextState.streak >= 3) {
+      const milestone = nextState.streak;
+      if (milestone === 3 || milestone === 5 || milestone === 10 || milestone % 10 === 0) {
+        setConfettiKey((k) => k + 1);
+        setStreakBadge(milestone);
+        hapticFeedback("streak");
+        setTimeout(() => setStreakBadge(null), 1600);
+      }
+    }
+    const hintTag = hintLevel > 0 ? ` hint_level=${hintLevel}` : "";
     const payload = wasRight
-      ? `[LEARN_ANSWER] type=mcq result=correct chosen="${chosenLetter}) ${options[i]}"`
-      : `[LEARN_ANSWER] type=mcq result=incorrect chosen="${chosenLetter}) ${options[i]}" correct="${correctLetter}) ${correctText}"`;
+      ? `[LEARN_ANSWER] type=mcq result=correct chosen="${chosenLetter}) ${options[i]}"${hintTag}`
+      : `[LEARN_ANSWER] type=mcq result=incorrect chosen="${chosenLetter}) ${options[i]}" correct="${correctLetter}) ${correctText}"${hintTag}`;
     setTimeout(() => onAnswer?.(payload), 380);
   };
 
-  // Keyboard: 1..9 and A..Z
+  // Keyboard: 1..9 / A..Z to pick, H to advance hint ladder.
   useEffect(() => {
     if (picked !== null) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // Ignore when typing in an input/textarea elsewhere.
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+        return;
+      }
       const k = e.key.toUpperCase();
+      if (k === "H") {
+        e.preventDefault();
+        setHintLevel((lv) => (lv < 2 ? ((lv + 1) as 0 | 1 | 2) : lv));
+        hapticFeedback("tap");
+        return;
+      }
       let idx = -1;
       if (/^[1-9]$/.test(k)) idx = parseInt(k, 10) - 1;
       else if (/^[A-Z]$/.test(k)) idx = k.charCodeAt(0) - 65;
@@ -289,20 +340,83 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [picked, options.length]);
+  }, [picked, options.length, hintLevel]);
 
   return (
     <CardShell
       tone="emerald"
       label={tt.question_choose}
-      rightSlot={picked === null ? <span className="text-[10px] text-muted-foreground">1 – {Math.min(options.length, 9)}</span> : null}
+      rightSlot={
+        picked === null ? (
+          <div className="flex items-center gap-2">
+            {hintLevel < 2 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setHintLevel((lv) => (lv < 2 ? ((lv + 1) as 0 | 1 | 2) : lv));
+                  hapticFeedback("tap");
+                }}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/30 transition-colors"
+                title={tt.hint_use}
+              >
+                <Lightbulb className="w-3 h-3" />
+                {tt.hint_use}
+              </button>
+            )}
+            <span className="text-[10px] text-muted-foreground">
+              1 – {Math.min(options.length, 9)}
+            </span>
+          </div>
+        ) : null
+      }
     >
+      {/* Streak celebration + confetti — anchored to the card. */}
+      <ConfettiBurst trigger={confettiKey} />
+      <AnimatePresence>
+        {streakBadge !== null && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 320, damping: 22 }}
+            className="absolute top-3 end-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-white text-[11px] font-bold shadow-[0_10px_25px_-10px_rgba(244,63,94,0.6)]"
+          >
+            <Flame className="w-3 h-3" />
+            {tt.streak_badge(streakBadge)}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <p className="text-[16px] font-semibold text-foreground leading-snug">{card.question}</p>
+
+      {/* Hint ladder disclosure */}
+      <AnimatePresence>
+        {hintLevel >= 1 && picked === null && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="flex items-start gap-2 rounded-2xl border border-amber-400/30 bg-amber-500/[0.06] px-3 py-2 text-xs text-amber-900 dark:text-amber-100"
+          >
+            <Lightbulb className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" />
+            <span className="leading-relaxed">
+              {hint1}
+              {hintLevel >= 2 && eliminated.size > 0 && (
+                <span className="block mt-1 text-amber-800/80 dark:text-amber-200/80">
+                  {tt.hint_eliminated}
+                </span>
+              )}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-col gap-2">
         {options.map((opt: string, i: number) => {
           const isPicked = picked === i;
           const revealed = picked !== null;
           const isCorrectOpt = i === correct;
+          const isEliminated = eliminated.has(i);
           const letter = String.fromCharCode(65 + i);
 
           let cls =
@@ -310,6 +424,10 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
           let chipCls =
             "bg-muted/60 text-muted-foreground group-hover:bg-emerald-500/15 group-hover:text-emerald-600 dark:group-hover:text-emerald-300";
           let icon: React.ReactNode = null;
+          if (isEliminated && !revealed) {
+            cls = "border-border/30 bg-card/30 text-muted-foreground opacity-40 line-through cursor-not-allowed";
+            chipCls = "bg-muted/30 text-muted-foreground";
+          }
           if (revealed) {
             if (isCorrectOpt) {
               cls =
@@ -330,7 +448,7 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
             <motion.button
               key={i}
               type="button"
-              disabled={picked !== null}
+              disabled={picked !== null || isEliminated}
               onClick={() => submit(i)}
               whileTap={{ scale: 0.985 }}
               animate={isPicked && isRight ? { scale: [1, 1.02, 1] } : {}}
@@ -345,7 +463,7 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
               </span>
               <span className="flex-1 text-start leading-snug">{opt}</span>
               {icon}
-              {!revealed && (
+              {!revealed && !isEliminated && (
                 <span className="opacity-0 group-hover:opacity-100 transition-opacity">
                   <Kbd>{i + 1}</Kbd>
                 </span>
@@ -376,6 +494,8 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
     </CardShell>
   );
 };
+
+
 
 /* ───────────────────── Multi-select ───────────────────── */
 

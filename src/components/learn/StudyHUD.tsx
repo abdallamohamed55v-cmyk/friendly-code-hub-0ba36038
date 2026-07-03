@@ -1,9 +1,10 @@
 /** @doc Study HUD — the persistent progress bar for Learn Mode (streak, XP, Bloom rung, accuracy). Renders only when chatMode==="learning" and reads live from studyProgress via a subscription so every card answer updates it. */
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Flame, Sparkles, TrendingUp, Target } from "lucide-react";
+import { Flame, RotateCcw, Sparkles, Target, TrendingUp } from "lucide-react";
 import {
   getStudyState,
+  resetStudyState,
   subscribeStudyState,
   BLOOM_LABEL,
   BLOOM_ORDER,
@@ -108,9 +109,44 @@ export function StudyHUD() {
               />
             </div>
           </div>
+
+          {/* Reset — quiet, confirm-then-clear */}
+          <ResetButton />
         </div>
       </div>
     </div>
+  );
+}
+
+function ResetButton() {
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (!armed) return;
+    const t = window.setTimeout(() => setArmed(false), 3000);
+    return () => window.clearTimeout(t);
+  }, [armed]);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (!armed) {
+          setArmed(true);
+          return;
+        }
+        resetStudyState();
+        setArmed(false);
+      }}
+      aria-label={armed ? "Confirm reset" : "Reset learning session"}
+      title={armed ? "Tap again to confirm" : "Reset session"}
+      className={`ms-1 shrink-0 inline-flex items-center gap-1 px-1.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors ${
+        armed
+          ? "bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-400/40"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+      }`}
+    >
+      <RotateCcw className="w-3 h-3" />
+      {armed ? "Confirm" : ""}
+    </button>
   );
 }
 
