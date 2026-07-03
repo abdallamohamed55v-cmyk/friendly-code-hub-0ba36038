@@ -221,6 +221,11 @@ const en: LearnStrings = {
   scenario_label: "Real scenario — choose your next move",
   scenario_outcome: "What happens next",
   scenario_best_choice: "Best choice",
+  hint_use: "Hint",
+  hint_first_letter: "Starts with",
+  hint_generic: "Think about the definition you just read",
+  hint_eliminated: "One wrong option was crossed out",
+  streak_badge: (n) => `${n} in a row!`,
 };
 
 
