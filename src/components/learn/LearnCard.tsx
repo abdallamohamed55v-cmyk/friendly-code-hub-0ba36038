@@ -663,6 +663,18 @@ const TrueFalseCard = ({ card, onAnswer }: BaseProps) => {
     const wasRight = val === card.correct;
     recordAnswer({ correct: wasRight, cardType: "truefalse" });
     hapticFeedback(wasRight ? "correct" : "wrong");
+    const _cid = cardKey(card);
+    const _topic = cardTopic(card);
+    logItem({ cardId: _cid, topic: _topic, type: "truefalse", correct: wasRight });
+    if (!wasRight) {
+      logMistake({
+        cardId: _cid,
+        topic: _topic,
+        question: String(card.question || ""),
+        chosen: label,
+        correct: card.correct ? tt.correct : tt.wrong,
+      });
+    }
     const payload = wasRight
       ? `[LEARN_ANSWER] type=truefalse result=correct chosen="${label}"`
       : `[LEARN_ANSWER] type=truefalse result=incorrect chosen="${label}" correct="${card.correct ? tt.correct : tt.wrong}"`;
