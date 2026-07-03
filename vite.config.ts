@@ -92,13 +92,10 @@ export default defineConfig({
 
           if (id.includes("lucide-react")) return "icons";
 
-          // Radix: split the heavy overlay primitives (dialog/popover/tooltip)
-          // from the lightweight ones (label, slot, visually-hidden).
+          // Radix packages share internals and create circular dependencies;
+          // keep them together to preserve production initialization order.
           if (id.includes("@radix-ui")) {
-            if (/react-(dialog|popover|dropdown-menu|hover-card|tooltip|select|menu)/.test(id)) {
-              return "radix-overlays";
-            }
-            return "radix-core";
+            return "radix";
           }
 
           if (
