@@ -93,6 +93,10 @@ export function StudyHUD() {
             hint={`${state.cardsCorrect}/${state.cardsAnswered}`}
           />
 
+          {/* Due review chip — surfaces spaced-repetition items */}
+          <DueChip />
+
+
           {/* Bloom rung — takes remaining space */}
           <div className="ms-auto min-w-0 hidden sm:flex items-center gap-2 flex-1 max-w-[220px]">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground shrink-0">
