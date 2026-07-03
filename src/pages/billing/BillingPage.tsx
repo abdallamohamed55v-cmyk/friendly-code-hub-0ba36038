@@ -5,6 +5,39 @@ import { TrendingUp, TrendingDown, Clock, Sparkles, ArrowUpRight } from "lucide-
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SubShell, SubSection, SubCard, SubStatStrip } from "@/components/settings/SubShell";
+import KashierTopUp from "@/components/billing/KashierTopUp";
+
+// Heuristic: show Kashier pay option to MENA/Arabic users.
+const MENA_TIMEZONES = [
+  "Africa/Cairo",
+  "Asia/Riyadh",
+  "Asia/Dubai",
+  "Asia/Qatar",
+  "Asia/Kuwait",
+  "Asia/Baghdad",
+  "Asia/Amman",
+  "Asia/Beirut",
+  "Asia/Damascus",
+  "Africa/Casablanca",
+  "Africa/Algiers",
+  "Africa/Tunis",
+  "Africa/Tripoli",
+  "Africa/Khartoum",
+  "Asia/Muscat",
+  "Asia/Bahrain",
+];
+function isMenaUser(): boolean {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (MENA_TIMEZONES.includes(tz)) return true;
+    const lang = (navigator.language || "").toLowerCase();
+    if (lang.startsWith("ar")) return true;
+  } catch {
+    /* noop */
+  }
+  return false;
+}
+
 
 const BillingPage = () => {
   const navigate = useNavigate();
