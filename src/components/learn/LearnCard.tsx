@@ -3,6 +3,7 @@ import { m as motion, AnimatePresence } from "framer-motion";
 import { ArrowUp, Check, ChevronRight, Sparkles, X } from "lucide-react";
 import type { LearnCardData } from "@/lib/learnCardParser";
 import { detectLearnLocale, getLearnStrings, type LearnLocale } from "@/lib/learnCardI18n";
+import { recordAnswer, hapticFeedback, setStudyTopic } from "@/lib/studyProgress";
 
 /* ============================================================
  * Learn Mode — refined card system
@@ -262,6 +263,10 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
     const correctLetter = String.fromCharCode(65 + (correct as number));
     const correctText = options[correct as number] ?? "";
     const wasRight = i === correct;
+    // Feed the live-learner signal + haptic — this is what powers the
+    // StudyHUD and the [LEARN_STATE] block sent to the tutor next turn.
+    recordAnswer({ correct: wasRight, cardType: "mcq" });
+    hapticFeedback(wasRight ? "correct" : "wrong");
     const payload = wasRight
       ? `[LEARN_ANSWER] type=mcq result=correct chosen="${chosenLetter}) ${options[i]}"`
       : `[LEARN_ANSWER] type=mcq result=incorrect chosen="${chosenLetter}) ${options[i]}" correct="${correctLetter}) ${correctText}"`;
@@ -450,6 +455,8 @@ const MultiCard = ({ card, onAnswer }: BaseProps) => {
               .join(", ");
             const isAllRight =
               picks.length === correctSet.size && picks.every((p) => correctSet.has(p));
+            recordAnswer({ correct: isAllRight, cardType: "multi" });
+            hapticFeedback(isAllRight ? "correct" : "wrong");
             const payload = isAllRight
               ? `[LEARN_ANSWER] type=multi result=correct chosen=[${chosenText}]`
               : `[LEARN_ANSWER] type=multi result=incorrect chosen=[${chosenText}] correct=[${correctText}]`;
@@ -486,6 +493,8 @@ const TrueFalseCard = ({ card, onAnswer }: BaseProps) => {
     if (picked !== null) return;
     setPicked(val);
     const wasRight = val === card.correct;
+    recordAnswer({ correct: wasRight, cardType: "truefalse" });
+    hapticFeedback(wasRight ? "correct" : "wrong");
     const payload = wasRight
       ? `[LEARN_ANSWER] type=truefalse result=correct chosen="${label}"`
       : `[LEARN_ANSWER] type=truefalse result=incorrect chosen="${label}" correct="${card.correct ? tt.correct : tt.wrong}"`;
