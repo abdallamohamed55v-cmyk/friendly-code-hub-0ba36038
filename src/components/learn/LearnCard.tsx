@@ -1714,7 +1714,16 @@ const LearnCard = ({
       return <PhotoSolveCard card={card} onAnswer={onAnswer} />;
     case "onboarding":
       return <OnboardingCard card={card} onAnswer={onAnswer} />;
+    case "flashcard":
+      return <FlashcardCard card={card} onAnswer={onAnswer} />;
+    case "ordering":
+      return <OrderingCard card={card} onAnswer={onAnswer} />;
+    case "summary_write":
+      return <SummaryWriteCard card={card} onAnswer={onAnswer} />;
+    case "scenario":
+      return <ScenarioCard card={card} onAnswer={onAnswer} />;
     default:
+
       return (
         <CardShell tone="amber" label={getLearnStrings(localeFromCard(card)).card}>
           <pre className="text-xs text-muted-foreground overflow-x-auto">
