@@ -616,7 +616,7 @@ const ReferralsPage = () => {
 };
 
 const SHARE_TEXT = (link: string) =>
-  `جرب Megsy AI واحصل على ${CREDITS_PER_SIGNUP} رصيدًا مجانيًا عند التسجيل باستخدام رابط الدعوة الخاص بي:\n${link}`;
+  `Try Megsy AI and get ${CREDITS_PER_SIGNUP} free credits when you sign up with my invite link:\n${link}`;
 
 interface ShareSheetProps {
   link: string;
