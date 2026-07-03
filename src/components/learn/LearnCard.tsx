@@ -1696,6 +1696,18 @@ const LearnCard = ({
   card: LearnCardData;
   onAnswer?: (text: string) => void;
 }) => {
+  // Capture the current subject into the study HUD/prompt-state whenever
+  // the tutor emits a topic-bearing card (checkin/onboarding/roadmap).
+  // Best-effort — silent if `topic`/`title` are missing.
+  useEffect(() => {
+    const t =
+      (card as any).topic ||
+      (card as any).subject ||
+      (card as any).title ||
+      "";
+    if (t) setStudyTopic(String(t));
+  }, [card]);
+
   switch (card.type) {
     case "mcq":
       return <MCQCard card={card} onAnswer={onAnswer} />;
