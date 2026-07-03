@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { Check, AlertCircle, Loader2 } from "lucide-react";
 import MegsyStar from "@/components/files/MegsyStar";
 import { resolveToolActivity, brandIconUrl } from "@/lib/toolActivity";

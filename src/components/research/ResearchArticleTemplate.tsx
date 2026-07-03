@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { TemplateProps, splitIntoSections, hostname } from "./templateUtils";
 import SmartImage from "./SmartImage";

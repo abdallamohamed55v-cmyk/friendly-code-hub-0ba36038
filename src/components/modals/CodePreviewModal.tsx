@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Code2, Eye, FileCode2, Maximize2, Minimize2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import {
   buildProjectPreviewHtml,
   type ProjectFile,

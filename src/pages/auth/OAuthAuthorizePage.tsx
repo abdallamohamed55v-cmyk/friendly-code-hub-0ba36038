@@ -4,7 +4,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shield, X, Check, Loader2, ExternalLink } from "lucide-react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 
 export default function OAuthAuthorizePage() {
   const [searchParams] = useSearchParams();

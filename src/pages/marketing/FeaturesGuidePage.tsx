@@ -1,7 +1,7 @@
 /** @doc Long-form feature tour with screenshots, comparisons and walkthroughs. */
 import { lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import LandingNavbar from "@/components/landing/LandingNavbar";
 import SEOHead from "@/components/common/SEOHead";
 import { goBackOr } from "@/lib/navigation";

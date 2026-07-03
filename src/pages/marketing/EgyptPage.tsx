@@ -1,5 +1,5 @@
 /** @doc Localized landing for Egyptian users with Arabic-first messaging. */
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { useEffect } from "react";
 import Lenis from "lenis";
 import LandingNavbar from "@/components/landing/LandingNavbar";

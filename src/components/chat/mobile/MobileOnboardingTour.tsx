@@ -1,6 +1,6 @@
 /** @doc Mobile onboarding spotlight tour — dims the screen, cuts a hole around real UI targets (composer, +, send, model picker) and shows a tooltip with an arrow. Clean coach-mark pattern. */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { m as motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 
 const STORAGE_KEY = "megsy_mobile_onboarding_v4";

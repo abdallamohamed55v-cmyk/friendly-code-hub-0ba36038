@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import ChatMessage from "@/components/chat/ChatMessage";
 import ResearchJobBubble from "@/components/research/ResearchJobBubble";
 import {

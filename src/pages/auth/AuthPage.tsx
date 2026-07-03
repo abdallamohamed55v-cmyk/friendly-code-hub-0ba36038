@@ -1,7 +1,7 @@
 /** @doc Sign in / sign up — email, Google, Apple and MFA challenge entry. */
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { invokeFunction } from "@/lib/supabaseFunction";
 import { toast } from "sonner";

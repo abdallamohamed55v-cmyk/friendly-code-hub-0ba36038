@@ -8,7 +8,7 @@ import {
   Presentation,
   type LucideIcon,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import type { AgentDef } from "@/lib/agentRegistry";
 
 type ChipId =

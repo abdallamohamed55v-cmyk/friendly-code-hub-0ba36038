@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { Plus, ArrowUp, Square, Mic } from "lucide-react";
 
 const PLUS_HINT_KEY = "megsy_plus_hint_dismissed_v1";

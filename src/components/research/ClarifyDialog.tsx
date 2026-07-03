@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { HelpCircle, ArrowRight, X } from "lucide-react";
 
 export type ClarifyQuestion = {

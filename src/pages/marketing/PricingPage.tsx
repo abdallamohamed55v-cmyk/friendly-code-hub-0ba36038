@@ -1,6 +1,6 @@
 /** @doc Plans, yearly toggle, MC top-up packs and the official pricing FAQ — cinematic redesign. */
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useInView, useMotionValue, useTransform, animate } from "framer-motion";
+import { m as motion, AnimatePresence, useInView, useMotionValue, useTransform, animate } from "framer-motion";
 import { ArrowLeft, Check, Loader2, ChevronDown, Menu, X, Plus, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";

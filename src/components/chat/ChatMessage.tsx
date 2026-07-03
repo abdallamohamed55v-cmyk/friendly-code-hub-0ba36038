@@ -15,7 +15,7 @@ import {
   FolderTree,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import MegsyStar from "@/components/files/MegsyStar";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";

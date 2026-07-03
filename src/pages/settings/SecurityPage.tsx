@@ -1,6 +1,6 @@
 /** @doc Security overview — sessions, MFA, recovery codes. */
 // Security — Amber/Gold "The Vault" redesign.
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import LandingNavbar from "@/components/landing/LandingNavbar";
 import LandingFooter from "@/components/landing/LandingFooter";
 import SEOHead from "@/components/common/SEOHead";

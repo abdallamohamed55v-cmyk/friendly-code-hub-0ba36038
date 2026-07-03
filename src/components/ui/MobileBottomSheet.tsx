@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { motion, useMotionValue, animate, type PanInfo } from "framer-motion";
+import { m as motion, useMotionValue, animate, type PanInfo } from "framer-motion";
 
 interface MobileBottomSheetProps {
   open: boolean;

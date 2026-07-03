@@ -2,7 +2,7 @@
 // SlidesDeckCard's fullscreen presenter: dark backdrop, header chrome,
 // side chevrons, and a bottom filmstrip — but rendering A4 pages instead.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowRight, Download, Share2 } from "lucide-react";
 import { patchDocHtml } from "@/lib/agent/docs/patchHtml";
 import { useFullscreenBodyClass } from "@/hooks/useFullscreenBodyClass";
