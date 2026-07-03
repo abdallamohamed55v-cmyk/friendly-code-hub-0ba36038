@@ -318,6 +318,20 @@ const MCQCard = ({ card, onAnswer }: BaseProps) => {
       hintLevel: hintLevel as 0 | 1 | 2,
     });
     hapticFeedback(wasRight ? "correct" : "wrong");
+    // Durable memory: log the item (dedup by cardKey) and, on failure,
+    // capture the exact misconception so the tutor can pre-empt it.
+    const _cid = cardKey(card);
+    const _topic = cardTopic(card);
+    logItem({ cardId: _cid, topic: _topic, type: "mcq", correct: wasRight, hintLevel });
+    if (!wasRight) {
+      logMistake({
+        cardId: _cid,
+        topic: _topic,
+        question: String(card.question || ""),
+        chosen: `${chosenLetter}) ${options[i]}`,
+        correct: `${correctLetter}) ${correctText}`,
+      });
+    }
     // Celebrate: fire confetti on any streak milestone (3, 5, 10, 20…).
     if (wasRight && nextState.streak >= 3) {
       const milestone = nextState.streak;
