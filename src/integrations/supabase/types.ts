@@ -2847,6 +2847,54 @@ export type Database = {
         }
         Relationships: []
       }
+      kashier_orders: {
+        Row: {
+          amount: number
+          created_at: string
+          credits: number
+          currency: string
+          id: string
+          kashier_ref: string | null
+          method: string | null
+          order_id: string
+          plan: string | null
+          raw: Json | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          credits?: number
+          currency?: string
+          id?: string
+          kashier_ref?: string | null
+          method?: string | null
+          order_id: string
+          plan?: string | null
+          raw?: Json | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          credits?: number
+          currency?: string
+          id?: string
+          kashier_ref?: string | null
+          method?: string | null
+          order_id?: string
+          plan?: string | null
+          raw?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       key_usage_log: {
         Row: {
           cost_usd: number | null

@@ -24,3 +24,7 @@ verify_jwt = false
 
 [functions.kimi-coder]
 verify_jwt = false
+
+[functions.kashier-webhook]
+verify_jwt = false
+

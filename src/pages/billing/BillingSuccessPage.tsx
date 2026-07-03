@@ -62,6 +62,41 @@ const BillingSuccessPage = () => {
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
+    const provider = params.get("provider");
+    const kashierOrder = params.get("order");
+
+    // Kashier flow — poll our DB (webhook updates it)
+    if (provider === "kashier" && kashierOrder) {
+      let cancelled = false;
+      const poll = async (attempt = 0) => {
+        if (cancelled) return;
+        const { data } = await supabase
+          .from("kashier_orders")
+          .select("status, amount, currency, credits, plan, method")
+          .eq("order_id", kashierOrder)
+          .maybeSingle();
+        if (data) {
+          setDetails({
+            product_name: data.plan ? `${data.plan} Plan` : `${data.credits} MC top-up`,
+            amount: Number(data.amount) * 100,
+            currency: data.currency,
+          });
+          if (data.status === "paid") return setStatus("success");
+          if (data.status === "failed") return setStatus("failed");
+        }
+        if (attempt < 20) {
+          setStatus("pending");
+          setTimeout(() => poll(attempt + 1), 2000);
+        } else {
+          setStatus("pending");
+        }
+      };
+      poll();
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const identifier =
       params.get("checkout_id") || params.get("payment_id") || params.get("subscription_id");
     if (!identifier) {
@@ -88,6 +123,7 @@ const BillingSuccessPage = () => {
       }
     })();
   }, [params]);
+
 
   const handleSuccessContinue = async () => {
     setCreating(true);
