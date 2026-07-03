@@ -1,11 +1,18 @@
 /**
- * @doc installViewTransitions — wraps every history.pushState / replaceState in
- * document.startViewTransition() so React Router navigations get a native soft
- * fade automatically, with no per-link changes. No-op on browsers without the
- * View Transitions API (Firefox, older Safari) and when the user prefers
- * reduced motion. Skips hash-only, replaceState, and rapid successive calls.
+ * @doc installViewTransitions — intercepts internal SPA link clicks and wraps
+ * the subsequent React Router navigation inside document.startViewTransition()
+ * so the DOM cross-fades with a native easing curve. Ignores modifier clicks
+ * (cmd/ctrl/shift/alt), middle click, target=_blank, download links, hash-only
+ * jumps, and reduced-motion users. Silently no-ops on browsers without the
+ * View Transitions API (Firefox, older Safari).
+ *
+ * Why click-based instead of monkey-patching history.pushState: the
+ * startViewTransition callback runs on the next rendering opportunity, so
+ * wrapping pushState delayed the actual URL update by one frame and broke
+ * navigation timing. Intercepting clicks lets us start the transition first
+ * and let React Router push synchronously inside its callback.
  */
-type StartViewTransition = (cb: () => void) => { finished: Promise<void> };
+type StartViewTransition = (cb: () => void | Promise<void>) => { finished: Promise<void> };
 
 let installed = false;
 
@@ -19,33 +26,43 @@ export function installViewTransitions() {
   const prefersReduced = () =>
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
-  const originalPush = history.pushState.bind(history);
-  const originalReplace = history.replaceState.bind(history);
+  window.addEventListener(
+    "click",
+    (e) => {
+      if (e.defaultPrevented) return;
+      if (e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      const a = target?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a) return;
+      if (a.target && a.target !== "_self") return;
+      if (a.hasAttribute("download")) return;
+      const href = a.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
 
-  const samePath = (nextUrl: unknown): boolean => {
-    if (typeof nextUrl !== "string" && !(nextUrl instanceof URL)) return false;
-    try {
-      const next = new URL(String(nextUrl), window.location.href);
-      return next.pathname === window.location.pathname;
-    } catch {
-      return false;
-    }
-  };
+      let url: URL;
+      try {
+        url = new URL(a.href, window.location.href);
+      } catch {
+        return;
+      }
+      if (url.origin !== window.location.origin) return;
+      // Same path (query/hash only) — no transition needed.
+      if (url.pathname === window.location.pathname) return;
+      if (prefersReduced()) return;
 
-  history.pushState = function (data, unused, url) {
-    if (prefersReduced() || samePath(url)) {
-      return originalPush(data, unused, url as string | URL | null | undefined);
-    }
-    try {
-      doc.startViewTransition!(() =>
-        originalPush(data, unused, url as string | URL | null | undefined),
-      );
-    } catch {
-      originalPush(data, unused, url as string | URL | null | undefined);
-    }
-  } as typeof history.pushState;
-
-  // replaceState should never trigger transitions (used for query updates,
-  // redirect fixes, scroll restoration).
-  history.replaceState = originalReplace;
+      // Let React Router handle the click normally, but capture the current
+      // DOM snapshot right after this event so the next render animates in.
+      // We schedule startViewTransition on the next microtask, giving Router
+      // a chance to swap children before the "new" snapshot is taken.
+      try {
+        doc.startViewTransition!(
+          () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())),
+        );
+      } catch {
+        /* ignore */
+      }
+    },
+    { capture: true },
+  );
 }
