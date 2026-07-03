@@ -6,6 +6,8 @@ import "./styles/claude-chat.css";
 import "./styles/settings-amber.css";
 import "./styles/pwa-safe-area.css";
 import "./styles/pwa-responsive.css";
+import "./styles/view-transitions.css";
+
 
 
 // All fonts are loaded via Google Fonts <link> in index.html (Space Grotesk,
