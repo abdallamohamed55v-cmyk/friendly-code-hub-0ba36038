@@ -613,6 +613,18 @@ const MultiCard = ({ card, onAnswer }: BaseProps) => {
               picks.length === correctSet.size && picks.every((p) => correctSet.has(p));
             recordAnswer({ correct: isAllRight, cardType: "multi" });
             hapticFeedback(isAllRight ? "correct" : "wrong");
+            const _cid = cardKey(card);
+            const _topic = cardTopic(card);
+            logItem({ cardId: _cid, topic: _topic, type: "multi", correct: isAllRight });
+            if (!isAllRight) {
+              logMistake({
+                cardId: _cid,
+                topic: _topic,
+                question: String(card.question || ""),
+                chosen: chosenText,
+                correct: correctText,
+              });
+            }
             const payload = isAllRight
               ? `[LEARN_ANSWER] type=multi result=correct chosen=[${chosenText}]`
               : `[LEARN_ANSWER] type=multi result=incorrect chosen=[${chosenText}] correct=[${correctText}]`;
