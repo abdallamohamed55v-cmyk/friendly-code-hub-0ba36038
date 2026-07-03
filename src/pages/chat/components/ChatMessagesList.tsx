@@ -5,6 +5,10 @@ import { ChatMessageItem } from "./ChatMessageItem";
 const StudyTimersOverlay = lazy(() =>
   import("./StudyTimersOverlay").then((m) => ({ default: m.StudyTimersOverlay })),
 );
+// StudyHUD is also learning-only — lazy-load so non-learners never pay for it.
+const StudyHUD = lazy(() =>
+  import("@/components/learn/StudyHUD").then((m) => ({ default: m.StudyHUD })),
+);
 import { SystemEventsList } from "./SystemEventsList";
 import { TypingIndicator } from "./TypingIndicator";
 import type { ChatMode } from "../chatConstants";
@@ -71,6 +75,11 @@ export const ChatMessagesList = forwardRef<HTMLDivElement, ChatMessagesListProps
         className="max-w-3xl mx-auto pt-20 pb-56 md:pb-64 px-4 md:px-6 space-y-2"
         style={editingIndex !== null ? { visibility: "hidden" } : undefined}
       >
+        {chatMode === "learning" && (
+          <Suspense fallback={null}>
+            <StudyHUD />
+          </Suspense>
+        )}
         {messages.map((msg, i) => (
           // `content-visibility: auto` lets the browser skip painting/layout for
           // messages that are far outside the viewport (Facebook-style feed

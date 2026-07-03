@@ -63,8 +63,66 @@ const KNOWN_TYPES = new Set<string>([
 // Normalize options so the UI always receives an array of plain strings.
 // Some models emit options as { text, correct } / { label, is_correct } / etc.
 // In that case we also derive `correct` (index or index[]) when missing.
+//
+// This function is intentionally forgiving — different models spell every
+// field a different way, and we'd rather render a card than silently drop
+// it because a key was `question_text` instead of `question`.
 function normalizeCard(obj: any): any {
   if (!obj || typeof obj !== "object") return obj;
+
+  // ── Field aliases ────────────────────────────────────────────────
+  // Question text: models emit prompt / q / question_text / stem / body
+  if (obj.question == null) {
+    obj.question =
+      obj.prompt ??
+      obj.q ??
+      obj.question_text ??
+      obj.stem ??
+      obj.body ??
+      obj.text ??
+      undefined;
+  }
+  // Explanation: rationale / reason / because / why / feedback
+  if (obj.explain == null) {
+    obj.explain =
+      obj.explanation ??
+      obj.rationale ??
+      obj.reason ??
+      obj.because ??
+      obj.why ??
+      obj.feedback ??
+      undefined;
+  }
+  // Correct-answer: answer / correct_answer / correctIndex / correct_option /
+  //                  correct_index / correctOption
+  if (obj.correct == null) {
+    const candidate =
+      obj.answer ??
+      obj.correct_answer ??
+      obj.correctAnswer ??
+      obj.correctIndex ??
+      obj.correct_index ??
+      obj.correctOption ??
+      obj.correct_option;
+    if (candidate != null) obj.correct = candidate;
+  }
+  // Some models emit `correct` as a single-letter string ("B") for mcq. Convert.
+  if (
+    (obj.type === "mcq" || obj.type === "truefalse") &&
+    typeof obj.correct === "string"
+  ) {
+    const s = obj.correct.trim();
+    if (/^[A-Za-z]$/.test(s)) {
+      obj.correct = s.toUpperCase().charCodeAt(0) - 65;
+    } else if (/^\d+$/.test(s)) {
+      obj.correct = parseInt(s, 10);
+    } else if (obj.type === "truefalse") {
+      const low = s.toLowerCase();
+      if (["true", "t", "yes", "y", "صح", "نعم"].includes(low)) obj.correct = true;
+      else if (["false", "f", "no", "n", "خطأ", "لا"].includes(low)) obj.correct = false;
+    }
+  }
+
   if (Array.isArray(obj.options) && obj.options.some((o: any) => o && typeof o === "object")) {
     const derivedCorrect: number[] = [];
     const flat = obj.options.map((o: any, i: number) => {
