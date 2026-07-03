@@ -21,7 +21,12 @@ export type LearnCardType =
   | "exam_setup"
   | "exam_runner"
   | "photo_solve"
-  | "onboarding";
+  | "onboarding"
+  // ── new world-class card types ──
+  | "flashcard"      // spaced-repetition flip card (fact-dense recall)
+  | "ordering"       // put steps/events in the right order
+  | "summary_write"  // Feynman "teach it back in your words"
+  | "scenario";      // branching case: medicine, law, ethics, languages
 
 export interface LearnCardData {
   type: LearnCardType;
@@ -48,7 +53,12 @@ const KNOWN_TYPES = new Set<string>([
   "exam_runner",
   "photo_solve",
   "onboarding",
+  "flashcard",
+  "ordering",
+  "summary_write",
+  "scenario",
 ]);
+
 
 // Normalize options so the UI always receives an array of plain strings.
 // Some models emit options as { text, correct } / { label, is_correct } / etc.
@@ -86,11 +96,32 @@ function normalizeCard(obj: any): any {
       return [String(p ?? ""), ""];
     });
   }
+  // Ordering card: normalize `steps` / `items` / `sequence` into `steps: string[]`
+  // and derive `correct` = the ordered indices [0..n-1] if not provided.
+  if (obj.type === "ordering") {
+    const raw = obj.steps ?? obj.items ?? obj.sequence ?? obj.options ?? [];
+    if (Array.isArray(raw)) {
+      obj.steps = raw.map((s: any) => (typeof s === "string" ? s : String(s?.text ?? s?.label ?? s ?? "")));
+      if (!Array.isArray(obj.correct)) obj.correct = obj.steps.map((_: any, i: number) => i);
+    }
+  }
+  // Scenario: normalize branching `choices`
+  if (obj.type === "scenario" && Array.isArray(obj.choices)) {
+    obj.choices = obj.choices.map((c: any) => {
+      if (typeof c === "string") return { text: c };
+      return {
+        text: String(c?.text ?? c?.label ?? ""),
+        outcome: c?.outcome ?? c?.result ?? "",
+        correct: c?.correct === true || c?.best === true,
+      };
+    });
+  }
   return obj;
 }
 
 function tryParseCard(raw: string): LearnCardData | null {
   try {
+
     const obj = normalizeCard(JSON.parse(raw.trim()));
     if (!obj || typeof obj !== "object") return null;
     if (typeof obj.type === "string" && KNOWN_TYPES.has(obj.type)) {

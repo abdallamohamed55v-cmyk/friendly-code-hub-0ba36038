@@ -109,7 +109,25 @@ export type LearnStrings = {
   }) => string;
   on_correct_continue: string;
   on_wrong_simplify: string;
+  // ── new card types ──
+  flashcard_label: string;
+  flashcard_flip: string;
+  flashcard_knew: string;
+  flashcard_almost: string;
+  flashcard_didnt: string;
+  ordering_label: string;
+  ordering_hint: string;
+  ordering_check: string;
+  ordering_all_right: string;
+  ordering_some_wrong: string;
+  summary_label: string;
+  summary_placeholder: string;
+  summary_submit: string;
+  scenario_label: string;
+  scenario_outcome: string;
+  scenario_best_choice: string;
 };
+
 
 const en: LearnStrings = {
   question_choose: "Question — choose the answer",
@@ -181,7 +199,24 @@ const en: LearnStrings = {
     `Prepare an exam for me:\n- Topic: ${topic}\n- Number of questions: ${count}\n- Duration: ${duration} minutes\n- Difficulty: ${difficulty}\n- Question types: ${types}\n\nStart the exam directly in one reply as exam_runner.`,
   on_correct_continue: "You answered correctly — continue and give a harder question",
   on_wrong_simplify: "You answered wrong — explain again and simplify more",
+  flashcard_label: "Flashcard — tap to flip",
+  flashcard_flip: "Tap to see the answer",
+  flashcard_knew: "I knew it",
+  flashcard_almost: "Almost",
+  flashcard_didnt: "I didn't",
+  ordering_label: "Put the steps in order",
+  ordering_hint: "Tap to swap positions",
+  ordering_check: "Check my order",
+  ordering_all_right: "Perfect order",
+  ordering_some_wrong: "Some steps are out of order",
+  summary_label: "Teach it back in your own words",
+  summary_placeholder: "In 2–4 sentences, explain what you just learned…",
+  summary_submit: "Submit summary",
+  scenario_label: "Real scenario — choose your next move",
+  scenario_outcome: "What happens next",
+  scenario_best_choice: "Best choice",
 };
+
 
 const ar: LearnStrings = {
   question_choose: "سؤال — اختر الإجابة",
@@ -252,7 +287,24 @@ const ar: LearnStrings = {
     `جهّز لي امتحان:\n- الموضوع: ${topic}\n- عدد الأسئلة: ${count}\n- المدة: ${duration} دقيقة\n- المستوى: ${difficulty}\n- أنواع الأسئلة: ${types}\n\nابدأ الامتحان مباشرة في رد واحد كـ exam_runner.`,
   on_correct_continue: "إجابتي صحيحة — كمّل وادّيني سؤال أصعب",
   on_wrong_simplify: "إجابتي غلط — اشرح تاني وبسّط أكتر",
+  flashcard_label: "بطاقة تذكّر — دوس علشان تقلبها",
+  flashcard_flip: "اضغط علشان تشوف الإجابة",
+  flashcard_knew: "كنت عارف",
+  flashcard_almost: "تقريباً",
+  flashcard_didnt: "مكنتش عارف",
+  ordering_label: "رتّب الخطوات",
+  ordering_hint: "دوس علشان تبدّل المواقع",
+  ordering_check: "اتأكد من الترتيب",
+  ordering_all_right: "ترتيب مثالي",
+  ordering_some_wrong: "في خطوات مش في مكانها",
+  summary_label: "اشرحها بكلامك انت (Feynman)",
+  summary_placeholder: "في 2-4 جمل، اشرح اللي اتعلمته دلوقتي…",
+  summary_submit: "ابعت الشرح",
+  scenario_label: "سيناريو حقيقي — اختار خطوتك",
+  scenario_outcome: "اللي هيحصل بعدها",
+  scenario_best_choice: "الاختيار الأفضل",
 };
+
 
 const es: LearnStrings = {
   ...en,

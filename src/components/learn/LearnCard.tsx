@@ -1316,7 +1316,369 @@ const OnboardingCard = ({ card, onAnswer }: BaseProps) => {
   );
 };
 
+/* ───────────────────── Flashcard (spaced-repetition flip) ───────────────────── */
+
+const FlashcardCard = ({ card, onAnswer }: BaseProps) => {
+  const loc = localeFromCard(card);
+  const tt = getLearnStrings(loc);
+  const [flipped, setFlipped] = useState(false);
+  const [rated, setRated] = useState<null | "knew" | "almost" | "didnt">(null);
+
+  const rate = (r: "knew" | "almost" | "didnt") => {
+    if (rated) return;
+    setRated(r);
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try { (navigator as any).vibrate?.(r === "knew" ? 8 : 20); } catch {}
+    }
+    const payload = `[LEARN_ANSWER] type=flashcard front="${card.front || card.question || ""}" back="${card.back || card.answer || ""}" self_rating=${r}`;
+    setTimeout(() => onAnswer?.(payload), 320);
+  };
+
+  return (
+    <CardShell tone="violet" label={tt.flashcard_label}>
+      <motion.button
+        type="button"
+        onClick={() => setFlipped((f) => !f)}
+        whileTap={{ scale: 0.98 }}
+        className="relative w-full min-h-[140px] rounded-2xl border border-border/60 bg-gradient-to-b from-violet-500/[0.06] to-violet-500/[0.02] hover:from-violet-500/[0.10] hover:to-violet-500/[0.04] px-5 py-5 text-start transition-all"
+        aria-label={tt.flashcard_flip}
+      >
+        <AnimatePresence mode="wait">
+          {!flipped ? (
+            <motion.div
+              key="front"
+              initial={{ opacity: 0, rotateY: -20 }}
+              animate={{ opacity: 1, rotateY: 0 }}
+              exit={{ opacity: 0, rotateY: 20 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-2"
+            >
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-600 dark:text-violet-300 font-mono">
+                {card.category || tt.flashcard_label}
+              </div>
+              <div className="text-[17px] font-semibold text-foreground leading-snug">
+                {card.front || card.question}
+              </div>
+              <div className="pt-2 text-[11px] text-muted-foreground">{tt.flashcard_flip} ↻</div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="back"
+              initial={{ opacity: 0, rotateY: -20 }}
+              animate={{ opacity: 1, rotateY: 0 }}
+              exit={{ opacity: 0, rotateY: 20 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-2"
+            >
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300 font-mono">
+                {tt.correct_answer}
+              </div>
+              <div className="text-[16px] text-foreground leading-relaxed">{card.back || card.answer}</div>
+              {card.explain && (
+                <div className="text-xs text-muted-foreground leading-relaxed border-s-2 border-violet-400/40 ps-3 mt-2">
+                  {card.explain}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
+      <AnimatePresence>
+        {flipped && !rated && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-3 gap-2"
+          >
+            <button
+              type="button"
+              onClick={() => rate("didnt")}
+              className="min-h-11 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 text-xs font-semibold transition-colors"
+            >
+              {tt.flashcard_didnt}
+            </button>
+            <button
+              type="button"
+              onClick={() => rate("almost")}
+              className="min-h-11 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-semibold transition-colors"
+            >
+              {tt.flashcard_almost}
+            </button>
+            <button
+              type="button"
+              onClick={() => rate("knew")}
+              className="min-h-11 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-semibold transition-colors"
+            >
+              {tt.flashcard_knew}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </CardShell>
+  );
+};
+
+/* ───────────────────── Ordering (put steps in order) ───────────────────── */
+
+const OrderingCard = ({ card, onAnswer }: BaseProps) => {
+  const loc = localeFromCard(card);
+  const tt = getLearnStrings(loc);
+  const steps: string[] = Array.isArray(card.steps) ? card.steps : [];
+  const correctOrder: number[] = Array.isArray(card.correct)
+    ? card.correct
+    : steps.map((_, i) => i);
+  // Shuffle initial order deterministically-ish so re-render is stable
+  const initial = useMemo(() => {
+    const a = steps.map((_, i) => i);
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor((Math.sin(i + steps.length) + 1) * 5) % (i + 1);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    // Guard against already-sorted shuffle
+    if (a.every((v, i) => v === correctOrder[i])) {
+      [a[0], a[a.length - 1]] = [a[a.length - 1], a[0]];
+    }
+    return a;
+  }, [steps.length]);
+  const [order, setOrder] = useState<number[]>(initial);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+
+  const isRight = submitted && order.every((v, i) => v === correctOrder[i]);
+
+  const onTap = (idx: number) => {
+    if (submitted) return;
+    if (selectedIdx === null) {
+      setSelectedIdx(idx);
+      return;
+    }
+    if (selectedIdx === idx) {
+      setSelectedIdx(null);
+      return;
+    }
+    setOrder((o) => {
+      const n = [...o];
+      [n[selectedIdx], n[idx]] = [n[idx], n[selectedIdx]];
+      return n;
+    });
+    setSelectedIdx(null);
+  };
+
+  const submit = () => {
+    setSubmitted(true);
+    const asText = order.map((oi, i) => `${i + 1}. ${steps[oi]}`).join(" | ");
+    const correctText = correctOrder.map((oi, i) => `${i + 1}. ${steps[oi]}`).join(" | ");
+    const ok = order.every((v, i) => v === correctOrder[i]);
+    const payload = ok
+      ? `[LEARN_ANSWER] type=ordering result=correct order="${asText}"`
+      : `[LEARN_ANSWER] type=ordering result=incorrect order="${asText}" correct="${correctText}"`;
+    setTimeout(() => onAnswer?.(payload), 380);
+  };
+
+  return (
+    <CardShell tone="blue" label={tt.ordering_label} rightSlot={!submitted ? <span className="text-[10px] text-muted-foreground">{tt.ordering_hint}</span> : null}>
+      {card.question && (
+        <p className="text-[15px] font-semibold text-foreground leading-snug">{card.question}</p>
+      )}
+      <ol className="space-y-2">
+        {order.map((si, i) => {
+          const isSel = selectedIdx === i;
+          const isCorrectPos = submitted && si === correctOrder[i];
+          const isWrongPos = submitted && si !== correctOrder[i];
+          let cls = "border-border/60 bg-card/60 hover:border-blue-300/60";
+          if (isSel) cls = "border-blue-400/70 bg-blue-500/[0.12] " + TONE.blue.glow;
+          if (isCorrectPos) cls = "border-emerald-400/70 bg-emerald-500/[0.10]";
+          if (isWrongPos) cls = "border-rose-400/60 bg-rose-500/[0.08]";
+          return (
+            <motion.li
+              key={si}
+              layout
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            >
+              <button
+                type="button"
+                disabled={submitted}
+                onClick={() => onTap(i)}
+                className={`w-full flex items-center gap-3 text-start px-4 py-3 rounded-2xl border text-sm transition-all ${cls}`}
+              >
+                <span className="w-7 h-7 rounded-xl bg-blue-500/15 text-blue-700 dark:text-blue-300 text-[11px] font-bold grid place-items-center shrink-0">
+                  {i + 1}
+                </span>
+                <span className="flex-1">{steps[si]}</span>
+                {submitted && isCorrectPos && <Check className="w-4 h-4 text-emerald-500" />}
+                {submitted && isWrongPos && <X className="w-4 h-4 text-rose-500" />}
+              </button>
+            </motion.li>
+          );
+        })}
+      </ol>
+      {!submitted ? (
+        <button
+          type="button"
+          onClick={submit}
+          className="w-full py-2.5 rounded-2xl bg-gradient-to-b from-blue-500 to-blue-600 text-white text-sm font-semibold shadow-[0_8px_20px_-8px_rgba(59,130,246,0.5)] hover:brightness-110 transition-all"
+        >
+          {tt.ordering_check}
+        </button>
+      ) : (
+        <div className="space-y-2">
+          <ResultBanner
+            right={isRight}
+            labelRight={tt.ordering_all_right}
+            labelWrong={tt.ordering_some_wrong}
+          />
+          {card.explain && (
+            <div className="text-xs text-muted-foreground leading-relaxed border-s-2 border-blue-400/40 ps-3">
+              {card.explain}
+            </div>
+          )}
+        </div>
+      )}
+    </CardShell>
+  );
+};
+
+/* ───────────────────── Summary write (Feynman) ───────────────────── */
+
+const SummaryWriteCard = ({ card, onAnswer }: BaseProps) => {
+  const loc = localeFromCard(card);
+  const tt = getLearnStrings(loc);
+  const [val, setVal] = useState("");
+  const [sent, setSent] = useState(false);
+  const min = Math.max(20, Number(card.minChars) || 60);
+  const submit = () => {
+    if (val.trim().length < 5 || sent) return;
+    setSent(true);
+    const payload = `[LEARN_ANSWER] type=summary_write topic="${card.topic || card.question || ""}" summary="${val.trim().replace(/"/g, "'")}"`;
+    setTimeout(() => onAnswer?.(payload), 220);
+  };
+  const pct = Math.min(100, (val.length / min) * 100);
+  return (
+    <CardShell tone="violet" label={tt.summary_label}>
+      <p className="text-[15px] font-semibold text-foreground leading-snug">
+        {card.question || card.topic}
+      </p>
+      <div className="relative">
+        <textarea
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          disabled={sent}
+          rows={4}
+          placeholder={tt.summary_placeholder}
+          className="w-full px-4 py-3 rounded-2xl border border-border/60 bg-background/60 text-sm text-foreground outline-none focus:border-violet-400/60 focus:ring-2 focus:ring-violet-400/20 transition-all resize-none disabled:opacity-60"
+        />
+        <div className="mt-1.5 h-1 rounded-full bg-muted/60 overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-violet-400 to-violet-600"
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          />
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={submit}
+        disabled={val.trim().length < 5 || sent}
+        className="w-full py-2.5 rounded-2xl bg-gradient-to-b from-violet-500 to-violet-600 text-white text-sm font-semibold shadow-[0_8px_20px_-8px_rgba(139,92,246,0.5)] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+      >
+        {sent ? tt.sent_grading : tt.summary_submit}
+      </button>
+    </CardShell>
+  );
+};
+
+/* ───────────────────── Scenario (branching) ───────────────────── */
+
+const ScenarioCard = ({ card, onAnswer }: BaseProps) => {
+  const loc = localeFromCard(card);
+  const tt = getLearnStrings(loc);
+  const [picked, setPicked] = useState<number | null>(null);
+  const choices: Array<{ text: string; outcome?: string; correct?: boolean }> = Array.isArray(card.choices) ? card.choices : [];
+  const pick = (i: number) => {
+    if (picked !== null) return;
+    setPicked(i);
+    const c = choices[i];
+    const payload = `[LEARN_ANSWER] type=scenario chosen="${c?.text ?? ""}" result=${c?.correct ? "correct" : "incorrect"}`;
+    setTimeout(() => onAnswer?.(payload), 380);
+  };
+  const chosen = picked !== null ? choices[picked] : null;
+  return (
+    <CardShell tone="amber" label={tt.scenario_label}>
+      {card.title && (
+        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-300 font-mono">
+          {card.title}
+        </div>
+      )}
+      {card.situation && (
+        <p className="text-[15px] text-foreground leading-relaxed">{card.situation}</p>
+      )}
+      {card.question && (
+        <p className="text-[15px] font-semibold text-foreground leading-snug">{card.question}</p>
+      )}
+      <div className="flex flex-col gap-2">
+        {choices.map((c, i) => {
+          const isPicked = picked === i;
+          const revealed = picked !== null;
+          let cls = "border-border/60 bg-card/60 hover:border-amber-300/60";
+          if (revealed) {
+            if (c.correct) cls = "border-emerald-400/70 bg-emerald-500/[0.10]";
+            else if (isPicked) cls = "border-rose-400/60 bg-rose-500/[0.08]";
+            else cls = "border-border/40 bg-card/40 opacity-60";
+          }
+          return (
+            <motion.button
+              key={i}
+              type="button"
+              disabled={picked !== null}
+              onClick={() => pick(i)}
+              whileTap={{ scale: 0.985 }}
+              className={`text-start px-4 py-3 rounded-2xl border text-sm transition-all ${cls}`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-lg bg-amber-500/15 text-amber-700 dark:text-amber-300 text-[11px] font-bold grid place-items-center shrink-0">
+                  {String.fromCharCode(65 + i)}
+                </span>
+                <span className="flex-1 font-medium text-foreground/90">{c.text}</span>
+                {revealed && c.correct && <Check className="w-4 h-4 text-emerald-500" />}
+                {revealed && isPicked && !c.correct && <X className="w-4 h-4 text-rose-500" />}
+              </div>
+            </motion.button>
+          );
+        })}
+      </div>
+      <AnimatePresence>
+        {chosen && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-2"
+          >
+            <ResultBanner
+              right={!!chosen.correct}
+              labelRight={tt.scenario_best_choice}
+              labelWrong={tt.scenario_outcome}
+            />
+            {chosen.outcome && (
+              <div className="rounded-2xl bg-amber-500/[0.08] border border-amber-400/30 px-4 py-3 text-sm text-foreground/90 leading-relaxed">
+                {chosen.outcome}
+              </div>
+            )}
+            {card.explain && (
+              <div className="text-xs text-muted-foreground leading-relaxed border-s-2 border-amber-400/40 ps-3">
+                {card.explain}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </CardShell>
+  );
+};
+
 /* ───────────────────── Router ───────────────────── */
+
 
 const LearnCard = ({
   card,
@@ -1352,7 +1714,16 @@ const LearnCard = ({
       return <PhotoSolveCard card={card} onAnswer={onAnswer} />;
     case "onboarding":
       return <OnboardingCard card={card} onAnswer={onAnswer} />;
+    case "flashcard":
+      return <FlashcardCard card={card} onAnswer={onAnswer} />;
+    case "ordering":
+      return <OrderingCard card={card} onAnswer={onAnswer} />;
+    case "summary_write":
+      return <SummaryWriteCard card={card} onAnswer={onAnswer} />;
+    case "scenario":
+      return <ScenarioCard card={card} onAnswer={onAnswer} />;
     default:
+
       return (
         <CardShell tone="amber" label={getLearnStrings(localeFromCard(card)).card}>
           <pre className="text-xs text-muted-foreground overflow-x-auto">
