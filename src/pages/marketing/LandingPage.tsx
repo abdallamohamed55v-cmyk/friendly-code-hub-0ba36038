@@ -70,6 +70,20 @@ const LandingPage = ({ locale = "en" }: LandingPageProps) => {
   // Render landing immediately; auth check happens in background so the
   // first paint is not blocked by a Supabase network round-trip.
   const [ready, setReady] = useState(true);
+  // Defer the decorative FlyingMegsyStar until the browser is idle so it
+  // doesn't compete with the hero paint / hydration.
+  const [starReady, setStarReady] = useState(false);
+  useEffect(() => {
+    type IdleWin = Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    const w = window as IdleWin;
+    const schedule = w.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 400));
+    const id = schedule(() => setStarReady(true), { timeout: 1500 });
+    return () => {
+      if (typeof id === "number") clearTimeout(id);
+    };
+  }, []);
 
   useEffect(() => {
     if (!ready) return;
