@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { useLandingContent } from "@/lib/landing/LandingContentContext";
 
 const SETTINGS_LABELS: Record<

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 const iconClass = "h-full w-full text-value-ink";

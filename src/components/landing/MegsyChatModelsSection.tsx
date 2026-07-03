@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { useLandingContent } from "@/lib/landing/LandingContentContext";
 import {
   Image as ImageIcon,

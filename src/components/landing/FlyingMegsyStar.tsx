@@ -1,5 +1,5 @@
 import { useEffect, useId } from "react";
-import { motion, useMotionValue, useSpring, animate } from "framer-motion";
+import { m as motion, useMotionValue, useSpring, animate } from "framer-motion";
 import { useZone } from "@/contexts/ZoneContext";
 
 /**

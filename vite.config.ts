@@ -26,6 +26,11 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: true,
   },
+  // Drop console.* and debugger from production JS via esbuild — no terser install needed.
+  esbuild: {
+    drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
+    legalComments: "none",
+  },
   build: {
     target: "es2020",
     cssCodeSplit: true,

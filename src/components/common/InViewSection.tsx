@@ -15,7 +15,11 @@ interface Props {
 const InViewSection = ({ children, fallback, rootMargin = "400px", minHeight = 200 }: Props) => {
   const { ref, inView } = useInView<HTMLDivElement>({ rootMargin });
   return (
-    <div ref={ref} style={{ minHeight: inView ? undefined : minHeight }}>
+    <div
+      ref={ref}
+      className="cv-auto"
+      style={{ minHeight: inView ? undefined : minHeight }}
+    >
       {inView ? <Suspense fallback={fallback}>{children}</Suspense> : fallback}
     </div>
   );

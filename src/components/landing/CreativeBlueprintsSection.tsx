@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m as motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import card1 from "@/assets/blueprint-save-time.webp";
 import card2 from "@/assets/blueprint-stay-consistent.webp";

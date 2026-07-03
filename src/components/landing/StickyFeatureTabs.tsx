@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import ChatDemoMock from "./demos/ChatDemoMock";
 import ImageDemoMock from "./demos/ImageDemoMock";
