@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Check, Loader2, Building2 } from "lucide-react";
 import { toast } from "sonner";

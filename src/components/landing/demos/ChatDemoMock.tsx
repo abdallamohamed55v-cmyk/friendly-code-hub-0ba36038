@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Paperclip, Globe, ArrowUp } from "lucide-react";
 import MegsyStar from "@/components/branding/MegsyStar";
 

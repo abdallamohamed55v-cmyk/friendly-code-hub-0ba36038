@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { useLandingContent } from "@/lib/landing/LandingContentContext";
 import { Helmet } from "react-helmet-async";
