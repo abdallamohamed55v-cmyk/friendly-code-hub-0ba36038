@@ -314,6 +314,11 @@ const ar: LearnStrings = {
   scenario_label: "سيناريو حقيقي — اختار خطوتك",
   scenario_outcome: "اللي هيحصل بعدها",
   scenario_best_choice: "الاختيار الأفضل",
+  hint_use: "تلميح",
+  hint_first_letter: "يبدأ بـ",
+  hint_generic: "فكّر في التعريف اللي قريته دلوقتي",
+  hint_eliminated: "اتشطب اختيار واحد غلط",
+  streak_badge: (n) => `${n} صح ورا بعض!`,
 };
 
 
