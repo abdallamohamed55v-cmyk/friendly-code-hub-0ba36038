@@ -64,14 +64,12 @@ export default defineConfig({
           }
           if (id.includes("@supabase")) return "supabase";
 
-          // Motion: split the animation "features" (drag, layout, gesture)
-          // from the core primitives so lightweight motion.div consumers don't
-          // pull the whole feature set.
+          // Motion must stay in one chunk. Splitting Framer Motion internals
+          // across `motion-core` / `motion-features` can break its circular
+          // initialization order in production builds and crash before React
+          // mounts, leaving the app on a blank black screen.
           if (id.includes("framer-motion")) {
-            if (/framer-motion\/dist\/(es|cjs)\/(gestures|drag|projection|render\/dom\/features)/.test(id)) {
-              return "motion-features";
-            }
-            return "motion-core";
+            return "motion";
           }
 
           // @lobehub icons: split per provider so a page that only shows OpenAI
@@ -94,13 +92,10 @@ export default defineConfig({
 
           if (id.includes("lucide-react")) return "icons";
 
-          // Radix: split the heavy overlay primitives (dialog/popover/tooltip)
-          // from the lightweight ones (label, slot, visually-hidden).
+          // Radix packages share internals and create circular dependencies;
+          // keep them together to preserve production initialization order.
           if (id.includes("@radix-ui")) {
-            if (/react-(dialog|popover|dropdown-menu|hover-card|tooltip|select|menu)/.test(id)) {
-              return "radix-overlays";
-            }
-            return "radix-core";
+            return "radix";
           }
 
           if (
