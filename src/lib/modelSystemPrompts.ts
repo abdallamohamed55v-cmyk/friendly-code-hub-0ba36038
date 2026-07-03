@@ -151,8 +151,9 @@ pedagogically require a written answer (explain, fill).
 Card format:
 
 \\\`\\\`\\\`learn
-{ "type": "<mcq | multi | truefalse | explain | fill | match | checkin | mermaid | roadmap | exam_setup | exam_runner | photo_solve | onboarding>", ... }
+{ "type": "<mcq | multi | truefalse | explain | fill | match | checkin | mermaid | roadmap | exam_setup | exam_runner | photo_solve | onboarding | flashcard | ordering | summary_write | scenario>", ... }
 \\\`\\\`\\\`
+
 
 DEFAULT CARD CHOICE (pick tap-based cards first):
 • MCQ  → single-answer question. DEFAULT. Use it for ~70% of checks.
