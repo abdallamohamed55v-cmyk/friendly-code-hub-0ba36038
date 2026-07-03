@@ -287,7 +287,24 @@ const ar: LearnStrings = {
     `جهّز لي امتحان:\n- الموضوع: ${topic}\n- عدد الأسئلة: ${count}\n- المدة: ${duration} دقيقة\n- المستوى: ${difficulty}\n- أنواع الأسئلة: ${types}\n\nابدأ الامتحان مباشرة في رد واحد كـ exam_runner.`,
   on_correct_continue: "إجابتي صحيحة — كمّل وادّيني سؤال أصعب",
   on_wrong_simplify: "إجابتي غلط — اشرح تاني وبسّط أكتر",
+  flashcard_label: "بطاقة تذكّر — دوس علشان تقلبها",
+  flashcard_flip: "اضغط علشان تشوف الإجابة",
+  flashcard_knew: "كنت عارف",
+  flashcard_almost: "تقريباً",
+  flashcard_didnt: "مكنتش عارف",
+  ordering_label: "رتّب الخطوات",
+  ordering_hint: "دوس علشان تبدّل المواقع",
+  ordering_check: "اتأكد من الترتيب",
+  ordering_all_right: "ترتيب مثالي",
+  ordering_some_wrong: "في خطوات مش في مكانها",
+  summary_label: "اشرحها بكلامك انت (Feynman)",
+  summary_placeholder: "في 2-4 جمل، اشرح اللي اتعلمته دلوقتي…",
+  summary_submit: "ابعت الشرح",
+  scenario_label: "سيناريو حقيقي — اختار خطوتك",
+  scenario_outcome: "اللي هيحصل بعدها",
+  scenario_best_choice: "الاختيار الأفضل",
 };
+
 
 const es: LearnStrings = {
   ...en,
