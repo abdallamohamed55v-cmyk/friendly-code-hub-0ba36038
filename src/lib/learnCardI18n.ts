@@ -199,7 +199,24 @@ const en: LearnStrings = {
     `Prepare an exam for me:\n- Topic: ${topic}\n- Number of questions: ${count}\n- Duration: ${duration} minutes\n- Difficulty: ${difficulty}\n- Question types: ${types}\n\nStart the exam directly in one reply as exam_runner.`,
   on_correct_continue: "You answered correctly — continue and give a harder question",
   on_wrong_simplify: "You answered wrong — explain again and simplify more",
+  flashcard_label: "Flashcard — tap to flip",
+  flashcard_flip: "Tap to see the answer",
+  flashcard_knew: "I knew it",
+  flashcard_almost: "Almost",
+  flashcard_didnt: "I didn't",
+  ordering_label: "Put the steps in order",
+  ordering_hint: "Tap to swap positions",
+  ordering_check: "Check my order",
+  ordering_all_right: "Perfect order",
+  ordering_some_wrong: "Some steps are out of order",
+  summary_label: "Teach it back in your own words",
+  summary_placeholder: "In 2–4 sentences, explain what you just learned…",
+  summary_submit: "Submit summary",
+  scenario_label: "Real scenario — choose your next move",
+  scenario_outcome: "What happens next",
+  scenario_best_choice: "Best choice",
 };
+
 
 const ar: LearnStrings = {
   question_choose: "سؤال — اختر الإجابة",
