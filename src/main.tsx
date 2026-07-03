@@ -164,6 +164,8 @@ if (savedBubble) document.documentElement.style.setProperty("--user-bubble", sav
 
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
-    <App />
+    <LazyMotion features={domMax} strict={false}>
+      <App />
+    </LazyMotion>
   </HelmetProvider>,
 );
