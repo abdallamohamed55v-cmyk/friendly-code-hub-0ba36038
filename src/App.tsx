@@ -616,7 +616,7 @@ const App = () => {
               <ZoneProvider>
               <PromoBannerProvider>
                 <ConfirmProvider>
-                  {/* PwaSplash removed — index.html initial-loader handles first paint */}
+                  <PwaSplash />
                   <ScrollToTop />
                   <InternalLinkInterceptor />
                   <DodoReturnRedirect />
