@@ -31,6 +31,14 @@ export default defineConfig({
     drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
     legalComments: "none",
   },
+  // Workers must be single-file bundles — disable manualChunks/external for
+  // the worker build so `new Worker(new URL(...))` compiles cleanly.
+  worker: {
+    format: "es",
+    rollupOptions: {
+      output: { manualChunks: undefined, inlineDynamicImports: true },
+    },
+  },
   build: {
     target: "es2020",
     cssCodeSplit: true,
