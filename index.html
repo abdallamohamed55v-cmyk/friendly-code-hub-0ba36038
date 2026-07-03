@@ -105,7 +105,20 @@
       </defs>
     </svg>
     <div id="root"></div>
+    <!-- Speculation Rules API (Chromium 111+): prerender same-origin links on
+         moderate hover intent. Falls back silently on Safari/Firefox. -->
+    <script type="speculationrules">
+      {
+        "prerender": [
+          { "source": "document", "where": { "and": [ { "href_matches": "/*" }, { "not": { "href_matches": "/api/*" } }, { "not": { "href_matches": "/auth/*" } } ] }, "eagerness": "moderate" }
+        ],
+        "prefetch": [
+          { "source": "document", "where": { "href_matches": "/*" }, "eagerness": "conservative" }
+        ]
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
+
 
   </body>
 </html>
