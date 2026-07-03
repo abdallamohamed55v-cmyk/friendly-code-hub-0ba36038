@@ -193,7 +193,18 @@ export async function streamChat({
     let customSystem: string | null = null;
     try {
       const mod = await import("@/lib/modelSystemPrompts");
-      customSystem = mod.buildCustomSystem(chatMode, selectedModel?.id);
+      // In Learning mode, inject a compact live-learner signal so the
+      // tutor actually adapts (streak, XP, Bloom rung, accuracy, topic).
+      let learnState: string | null = null;
+      if (chatMode === "learning") {
+        try {
+          const sp = await import("@/lib/studyProgress");
+          learnState = sp.formatStudyStateForPrompt();
+        } catch {
+          learnState = null;
+        }
+      }
+      customSystem = mod.buildCustomSystem(chatMode, selectedModel?.id, learnState);
     } catch {
       customSystem = null;
     }
