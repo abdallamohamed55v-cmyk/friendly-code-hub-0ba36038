@@ -123,6 +123,28 @@ export function StudyHUD() {
   );
 }
 
+function DueChip() {
+  const summary = useSyncExternalStore(
+    subscribeMemory,
+    () => getDueSummary(Date.now(), 3),
+    () => getDueSummary(Date.now(), 3),
+  );
+  const count = summary.count;
+  if (count === 0) return null;
+  const label = count === 1 ? "1 due" : `${count} due`;
+  return (
+    <div
+      className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-amber-400/40 bg-amber-500/10 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-300"
+      title="Items due for spaced-repetition review — ask the tutor to /review"
+      aria-label={`${count} items due for review`}
+    >
+      <Repeat className="w-3 h-3" />
+      {label}
+    </div>
+  );
+}
+
+
 function ResetButton() {
   const [armed, setArmed] = useState(false);
   useEffect(() => {
