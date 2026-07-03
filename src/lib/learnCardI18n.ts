@@ -126,6 +126,12 @@ export type LearnStrings = {
   scenario_label: string;
   scenario_outcome: string;
   scenario_best_choice: string;
+  // ── laddered hints + streak celebration ──
+  hint_use: string;
+  hint_first_letter: string;
+  hint_generic: string;
+  hint_eliminated: string;
+  streak_badge: (n: number) => string;
 };
 
 
