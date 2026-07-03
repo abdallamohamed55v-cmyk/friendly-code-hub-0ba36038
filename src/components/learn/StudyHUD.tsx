@@ -1,9 +1,10 @@
 /** @doc Study HUD — the persistent progress bar for Learn Mode (streak, XP, Bloom rung, accuracy). Renders only when chatMode==="learning" and reads live from studyProgress via a subscription so every card answer updates it. */
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Flame, Sparkles, TrendingUp, Target } from "lucide-react";
+import { Flame, RotateCcw, Sparkles, Target, TrendingUp } from "lucide-react";
 import {
   getStudyState,
+  resetStudyState,
   subscribeStudyState,
   BLOOM_LABEL,
   BLOOM_ORDER,
