@@ -554,15 +554,43 @@ function flavorForModel(modelId?: string): string {
  * Build a custom system prompt for a turn, or return null to let the
  * edge function use its default. We only override when we actually
  * have something stronger to say (learning mode, or a per-model voice).
+ *
+ * @param learnState  Optional single-line "[LEARN_STATE] ..." string produced
+ *                    by `formatStudyStateForPrompt()`. When present in
+ *                    Learning mode, we append it plus an explicit rule
+ *                    telling the tutor to read it and adapt.
  */
 export function buildCustomSystem(
   chatMode: ChatMode | string | undefined,
   selectedModelId?: string,
+  learnState?: string | null,
 ): string | null {
   const parts: string[] = [];
 
   if (chatMode === "learning") {
     parts.push(LEARNING_PROMPT);
+    if (learnState && learnState.trim()) {
+      // The tutor MUST see this and MUST NOT echo it. Framed as an
+      // out-of-band signal, not conversational content.
+      parts.push(
+        [
+          "━━━━━━━━ LIVE LEARNER SIGNAL (READ, DO NOT ECHO) ━━━━━━━━",
+          "The line below reflects the learner's real state right now —",
+          "streak, XP, Bloom's rung, accuracy, and current topic.",
+          "Use it to CALIBRATE difficulty and tone this turn:",
+          "  • streak≥3 → congratulate briefly and push one rung harder.",
+          "  • accuracy<50% → drop one rung, re-teach with a simpler analogy.",
+          "  • rung high (Analyze/Evaluate/Create) → prefer scenario/summary_write",
+          "    over MCQ; reward original thinking.",
+          "  • rung low (Remember/Understand) → prefer MCQ/truefalse/flashcard.",
+          "  • topic present → keep the lesson INSIDE that topic unless the",
+          "    learner explicitly pivots.",
+          "NEVER quote the line back. NEVER mention '[LEARN_STATE]' in prose.",
+          "",
+          learnState.trim(),
+        ].join("\n"),
+      );
+    }
   } else if (chatMode === "code") {
     parts.push(CODER_PROMPT);
   }
