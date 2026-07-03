@@ -210,15 +210,10 @@ export function formatStudyStateForPrompt(): string | null {
   // the learner across turns and sessions.
   let memoryBlock: string | null = null;
   try {
-    // Sync import via require-style is not available in ESM; use dynamic-import
-    // synchronously by touching the module the caller has already loaded.
-    // We fall back gracefully if the module isn't in the graph yet.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-    const mem = (globalThis as any).__megsyLearnMemory;
-    if (mem && typeof mem.formatMemoryForPrompt === "function") {
-      memoryBlock = mem.formatMemoryForPrompt();
-    }
-  } catch { /* noop */ }
+    memoryBlock = formatMemoryForPrompt();
+  } catch {
+    memoryBlock = null;
+  }
 
   if (s.cardsAnswered === 0 && !s.topic && !memoryBlock) return null;
   return memoryBlock ? `${stateLine}\n${memoryBlock}` : stateLine;
