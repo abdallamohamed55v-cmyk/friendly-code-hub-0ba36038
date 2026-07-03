@@ -1885,7 +1885,10 @@ const LearnCard = ({
       (card as any).subject ||
       (card as any).title ||
       "";
-    if (t) setStudyTopic(String(t));
+    if (t) {
+      setStudyTopic(String(t));
+      noteTopicVisit(String(t));
+    }
   }, [card]);
 
   switch (card.type) {
