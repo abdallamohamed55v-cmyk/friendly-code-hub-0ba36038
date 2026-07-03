@@ -31,6 +31,9 @@ const HeroSection = () => {
         muted
         playsInline
         preload="auto"
+        // LCP hint — the hero video is the largest above-the-fold element.
+        // React 19 forwards `fetchPriority` to the DOM attribute.
+        {...({ fetchpriority: "high" } as any)}
         aria-hidden
         className="absolute inset-0 h-full w-full object-cover"
       />
