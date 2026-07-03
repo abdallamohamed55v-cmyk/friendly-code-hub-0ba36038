@@ -64,14 +64,12 @@ export default defineConfig({
           }
           if (id.includes("@supabase")) return "supabase";
 
-          // Motion: split the animation "features" (drag, layout, gesture)
-          // from the core primitives so lightweight motion.div consumers don't
-          // pull the whole feature set.
+          // Motion must stay in one chunk. Splitting Framer Motion internals
+          // across `motion-core` / `motion-features` can break its circular
+          // initialization order in production builds and crash before React
+          // mounts, leaving the app on a blank black screen.
           if (id.includes("framer-motion")) {
-            if (/framer-motion\/dist\/(es|cjs)\/(gestures|drag|projection|render\/dom\/features)/.test(id)) {
-              return "motion-features";
-            }
-            return "motion-core";
+            return "motion";
           }
 
           // @lobehub icons: split per provider so a page that only shows OpenAI
