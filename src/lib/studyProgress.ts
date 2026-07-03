@@ -1,5 +1,7 @@
 /** @doc Study progress persistence — tracks streak, XP, Bloom rung, mastery per topic across the Learn Mode session, and feeds a compact [LEARN_STATE] hint into the tutor system prompt so responses adapt in real time. */
 
+import { formatMemoryForPrompt } from "@/lib/learnMemory";
+
 // ============================================================
 // Study Progress — the "memory" of Learn Mode
 // ------------------------------------------------------------
