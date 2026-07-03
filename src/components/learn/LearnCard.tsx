@@ -3,7 +3,7 @@ import { m as motion, AnimatePresence } from "framer-motion";
 import { ArrowUp, Check, ChevronRight, Flame, Lightbulb, Sparkles, X } from "lucide-react";
 import type { LearnCardData } from "@/lib/learnCardParser";
 import { detectLearnLocale, getLearnStrings, type LearnLocale } from "@/lib/learnCardI18n";
-import { recordAnswer, hapticFeedback, setStudyTopic, getStudyState } from "@/lib/studyProgress";
+import { recordAnswer, hapticFeedback, setStudyTopic } from "@/lib/studyProgress";
 import { ConfettiBurst } from "@/components/common/ConfettiBurst";
 
 /* ============================================================
