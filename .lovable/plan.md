@@ -1,99 +1,67 @@
-# خطة تطبيق Code Splitting بمستوى Facebook على كل صفحات الموقع
+## مراجعة شاملة لوضع التعليم — الهدف: الأفضل بالعالم
 
-## الهدف
-تقليل حجم أول تحميل (initial JS) لكل صفحة من ~1-4MB إلى أقل من ~150KB، عبر تقسيم الكود على 3 مستويات: **route → component → interaction**.
+### 1. Audit كامل (قبل أي تعديل)
+- قراءة كل ملفات Learn: `LearnCard.tsx` (1366 سطر) بالكامل، `InChatTimerCard.tsx`, `learnCardParser.ts`, `learnCardI18n.ts`, `useStudyMode.ts`, `LEARNING_PROMPT` في `modelSystemPrompts.ts`.
+- فحص التكامل: `ChatMessage.tsx`, `StudyTimersOverlay`, `ComposerAnimatedInput` لوضع التعليم.
+- تسجيل: bugs, حالات ناقصة (empty/error/loading states)، مشاكل a11y (aria, keyboard, contrast)، RTL، mobile touch targets، أنيميشن مكسور، تكرار كود.
 
----
+### 2. Parser & Robustness (فادح للجودة)
+- دعم أنواع بطاقات جديدة يحتاجها التعليم العالمي:
+  - `flashcard` (Spaced-Repetition flip)
+  - `ordering` (رتّب الخطوات)
+  - `hotspot` (اضغط على المنطقة الصحيحة في صورة/دياجرام)
+  - `code_run` (شغّل كود صغير — للبرمجة)
+  - `audio_listen` (استمع ثم أجب — للغات)
+  - `drawing` (ارسم إجابتك — للأطفال والرياضيات)
+  - `poll` (رأي جماعي — للفصول)
+  - `summary_write` (لخّص بكلماتك — Bloom عالي)
+- تحسين normalize: تسامح مع أخطاء الـ AI (options ككائنات، correct كنص، إلخ).
+- fallback واضح لو JSON مكسور (بدل ما يختفي البلوك).
 
-## المرحلة 1 — البنية التحتية (ملفات مشتركة جديدة)
+### 3. تلميع UI/UX داخل `LearnCard.tsx`
+- **Micro-interactions**: haptic feedback (navigator.vibrate) عند الإجابة، صوت خفيف اختياري، confetti spring على إجابة صحيحة متتالية (streak).
+- **Streak & XP HUD**: شريط صغير أعلى البطاقات يعرض streak حالية + XP + المستوى (Bloom rung).
+- **Progress memory**: حفظ التقدم في `localStorage` لكل موضوع (لآخر جلسة).
+- **Explain-after-answer**: توسعة تلقائية للـ explanation مع أنيميشن height spring.
+- **Hints laddered**: زر "تلميح" يكشف 3 مستويات (nudge → hint → answer path).
+- **Skip / Bookmark / Report**: أزرار سياقية لكل بطاقة.
+- **Accessibility**: `role=radiogroup`, `aria-checked`, focus rings، keyboard كامل لكل نوع (ليس فقط MCQ)، احترام `prefers-reduced-motion`.
+- **RTL**: مراجعة كل `ml-`/`mr-`/`left-`/`right-` واستبدال بـ `ms-`/`me-`/`start-`/`end-`.
+- **Mobile**: تأكيد كل الأزرار ≥44px، منع misclicks بـ debounce صغير.
 
-1. **`src/lib/lazyOnIntent.ts`** — helper يحمّل مكون فقط عند أول hover/focus/touch على زر معين (بدل ما يتحمّل مع الصفحة).
-2. **`src/lib/lazyOnVisible.ts`** — helper يحمّل مكون عند دخوله viewport عبر IntersectionObserver (للفيديوهات، الصور الثقيلة، الأقسام السفلية).
-3. **`src/lib/lazyOnIdle.ts`** — helper يحمّل chunks الثانوية أثناء `requestIdleCallback` (analytics, prefetch, service worker).
-4. توسيع `globalLinkPrefetch.ts` الحالي ليدعم prefetch للـ **component chunks** مش الـ routes بس (عبر `<button data-prefetch="EmojiPicker">`).
+### 4. Timer & Exam
+- `CircularTimer`: إضافة pause/resume، sound toggle، صيغة `mm:ss` واضحة.
+- `Exam runner`: قفزة سريعة لأي سؤال (mini-map)، حفظ الإجابات محلياً ضد إعادة تحميل، مراجعة نهائية قبل التسليم.
+- Post-exam: توزيع علامات لكل Bloom level + توصيات ("راجع Cell Biology")، وزر "أنشئ خطة مراجعة" يرسل prompt جاهز.
 
----
+### 5. ترقية `LEARNING_PROMPT`
+- إضافة قوالب لكل النوع الجديد (flashcard, ordering, hotspot, ...) مع أمثلة JSON محكمة.
+- إلزام الـ AI باستخدام تنوع مقصود (لا 5 MCQ متتالية).
+- قواعد لكل فئة عمرية: 
+  - **حضانة/أطفال 3-6**: صور + رموز + صوت، جمل قصيرة، تشجيع دائم.
+  - **مدرسة 7-14**: قصص + ألعاب + مكافآت.
+  - **جامعة/كورسات**: عمق أكاديمي + مصادر + Bloom عالي.
+  - **مهنيون/راشدون**: تطبيق مباشر + case studies.
+- قواعد لكل مجال (طب/قانون/برمجة/لغات/رياضيات/فنون/دين) — لايبل: `[Domain: Medicine]`.
+- إلزام: كل جلسة تفتح بـ `checkin` (مستوى الطالب) وتُقفل بـ `summary_write` + خطة اليوم التالي.
 
-## المرحلة 2 — ChatPage (الأولوية القصوى، 2010 سطر / 227KB)
+### 6. Study session shell (خارج البطاقات)
+- شريط علوي ثابت في وضع التعليم يعرض: الموضوع الحالي، الوقت، streak، XP، زر "خذ استراحة".
+- Pomodoro مدمج مع الـ `InChatTimerCard`.
+- "Focus mode" — يخفي الشات الجانبي ويترك البطاقة فقط.
 
-تقسيم `src/pages/chat/ChatPage.tsx` وأولاده الثقال:
+### 7. Verify
+- `bunx tsgo --noEmit` + build.
+- اختبار يدوي عبر Playwright screenshot لكل نوع بطاقة (mcq, multi, match, exam, flashcard, ordering).
 
-| المكون | الوضع الحالي | بعد التعديل |
-|---|---|---|
-| `framer-motion` (motion) | eager | lazy عبر wrapper خفيف |
-| `EmojiPicker` / mention dropdown | eager | `lazyOnIntent` عند ضغط الأيقونة |
-| Background `<video>` سطح المكتب | eager في DOM | `lazyOnVisible` + `loading="lazy"` |
-| `ComposerAttachments` (upload/paste) | eager | lazy عند إضافة أول ملف |
-| `DraggablePlusSheet` / `PlusContent` | eager | `lazyOnIntent` |
-| `SlidesTemplateButton` sheet | eager | lazyOnIntent |
-| `StudyTimersOverlay` | eager | lazy عند فتح المؤقت |
-| `MegsyOsIntro` / `DesktopGreeting` | eager | lazy فقط لأول رسالة |
-| `react-markdown` + `syntax-highlighter` | يدخل في bundle الشات | يُحمَّل فقط عند وصول أول رسالة تحوي code fence |
-| `hls.js` / video player | eager | `lazyOnVisible` |
-| كل مكون في `lazyComponents.ts` | ✓ | نضيف preload on hover |
+### Files to edit
+- `src/lib/learnCardParser.ts` — أنواع جديدة + normalize أقوى
+- `src/lib/learnCardI18n.ts` — نصوص للأنواع الجديدة
+- `src/components/learn/LearnCard.tsx` — رندر الأنواع الجديدة + micro-interactions + a11y + RTL
+- `src/components/learn/InChatTimerCard.tsx` — pause/resume/sound
+- `src/lib/modelSystemPrompts.ts` — LEARNING_PROMPT مطوّر
+- `src/pages/chat/hooks/useStudyMode.ts` — streak/XP/localStorage
+- (جديد) `src/components/learn/StudyHUD.tsx` — الشريط العلوي
+- (جديد) `src/lib/studyProgress.ts` — تخزين التقدم
 
----
-
-## المرحلة 3 — LandingPage
-
-- بالفعل يستخدم `React.lazy` لكل قسم — نضيف:
-  - `IntersectionObserver` لكل `<Suspense>` (بدل ما تتحمّل كل sections الـ 14 مع أول scroll).
-  - Prefetch لـ `HeroSection` صور فوق الطي فقط.
-  - تأجيل `Lenis`, `FlyingMegsyStar`, `StatsMarquee` لـ `requestIdleCallback`.
-  - تحويل `framer-motion` في مكونات landing لـ `motion/mini` أو CSS transitions.
-
----
-
-## المرحلة 4 — Settings / Billing / Workspace / Auth
-
-- كل tab داخل SettingsPage → route lazy منفصل + prefetch on hover على الـ sidebar item.
-- BillingPage: `Stripe.js` / `@stripe/react-stripe-js` → lazyOnIntent عند فتح checkout modal فقط.
-- ReferralsPage tabs (Dashboard/Program/Tasks/Withdrawals) → lazy per tab.
-- WorkspacesPage: قوائم المستخدمين → virtualize + lazy pagination.
-- AuthPage: OAuth providers icons → lazy chunks منفصلة.
-
----
-
-## المرحلة 5 — Vendor chunks (vite.config.ts)
-
-تحديث `manualChunks` الحالي:
-- فصل `framer-motion` إلى `motion-core` + `motion-features` (features on-demand فقط).
-- فصل `@lobehub` لكل provider في chunk مستقل (openai, anthropic, google, …).
-- فصل `react-markdown/rehype/remark` عن `syntax-highlighter` (chunks منفصلة تماماً).
-- `@radix-ui` → chunk واحد لكل primitive شائع، وباقي primitives تُحمَّل مع مستخدميها.
-- إضافة `assetsInlineLimit: 2048` لتقليل requests للأيقونات الصغيرة.
-
----
-
-## المرحلة 6 — تفعيل Interaction-based Prefetching
-
-- إضافة `data-prefetch-chunk` attribute + observer عالمي يقرأه ويستدعي `import()`.
-- كل زر ثقيل في الـ composer/sidebar/settings يحصل على prefetch on `mouseenter` + `touchstart`.
-- استخدام `<link rel="modulepreload">` ديناميكياً عند hover على link مهم (بدل modulePreload: false الحالي، لكن مضبوط).
-
----
-
-## المرحلة 7 — التحقق
-
-1. `bun run build` + مقارنة أحجام chunks قبل/بعد (`scripts/perf-audit.mjs` موجود).
-2. اختبار visual للصفحات الأساسية عبر Playwright (لقطات قبل/بعد).
-3. `bunx vitest run` للتأكد إن مفيش اختبار كسر.
-4. فتح `/chat` و `/` و `/settings` وتسجيل أحجام الشبكة في DevTools.
-
----
-
-## المدة المتوقعة والمخاطر
-
-- **المدة**: عمل ضخم فعلياً (~15-25 تعديل ملف كبير). سيتم على دفعات ضمن هذه الجلسة، مع build بعد كل مرحلة.
-- **المخاطر**:
-  - كسر بعض التفاعلات إذا lazy component احتاج state قبل ما يتحمّل → نحل بـ Suspense fallback خفيف + prefetch on intent.
-  - hydration flicker في landing → نستخدم skeleton بنفس الأبعاد.
-  - تأخير أول ضغطة على زر ثقيل بعد أول hover ~50ms → مقبول ومطابق لسلوك FB.
-
-## القسم التقني (تفاصيل للمطور)
-
-- Vite 5 `build.rollupOptions.output.manualChunks` — تقسيم دقيق.
-- استخدام `React.lazy` + `Suspense` boundaries متعددة (واحد لكل قسم، مش واحد للصفحة كاملة).
-- `dynamic import()` ثابت المسار (بدون template strings) عشان Rollup يقدر يحلّله.
-- `IntersectionObserver` بـ `rootMargin: "300px"` عشان prefetch قبل الوصول للـ viewport.
-- `requestIdleCallback` مع fallback `setTimeout(cb, 200)` لسفاري.
+هل نبدأ من الـ Audit ونعرضلك القائمة الكاملة قبل أي تعديل، ولا نبدأ التنفيذ فوراً بالخطوات 2→7 بالترتيب؟
