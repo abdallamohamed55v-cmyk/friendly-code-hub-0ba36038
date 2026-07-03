@@ -33,6 +33,14 @@ export default defineConfig({
     assetsInlineLimit: 2048,
     chunkSizeWarningLimit: 1200,
     minify: "esbuild",
+  },
+  // Drop console.* and debugger from production JS. Uses esbuild's built-in
+  // pure-annotation stripping — no terser install, no extra build cost.
+  esbuild: {
+    drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
+    legalComments: "none",
+  },
+  __oldBuildBlockMarker: true as unknown as never,
     // Fully disable modulepreload. Vite's default behavior preloads the
     // transitive graph of every async chunk from the entry, which meant the
     // landing page eagerly fetched ~1MB of markdown/syntax/icons/chat code
