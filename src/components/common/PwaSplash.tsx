@@ -52,18 +52,19 @@ export default function PwaSplash() {
         style={{
           flex: 1,
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 14,
+          gap: 18,
           animation: "megsy-splash-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both",
         }}
       >
         <img
           src={megsyLogo}
           alt=""
-          width={44}
-          height={44}
-          style={{ width: 44, height: 44, objectFit: "contain", display: "block" }}
+          width={72}
+          height={72}
+          style={{ width: 72, height: 72, objectFit: "contain", display: "block" }}
         />
         <span
           style={{
@@ -72,11 +73,13 @@ export default function PwaSplash() {
             lineHeight: 1,
             color: "#fafafa",
             letterSpacing: "-0.01em",
+            textAlign: "center",
           }}
         >
-          Megsy
+          Megsy AI
         </span>
       </div>
+
 
       <div
         style={{
