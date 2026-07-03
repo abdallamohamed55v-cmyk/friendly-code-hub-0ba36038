@@ -3,7 +3,7 @@
 // bubble for the question, and a card below for the answer input. ALL
 // questions are treated as optional client-side so the user is never blocked.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { Check, Loader2, ArrowRight, ArrowLeft, Upload, X as XIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";

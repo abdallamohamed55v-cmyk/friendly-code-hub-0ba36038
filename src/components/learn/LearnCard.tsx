@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ArrowUp } from "lucide-react";
 // Mermaid is ~1MB; load it lazily only when a mermaid card renders (see loadMermaid below).
 import type { LearnCardData } from "@/lib/learnCardParser";

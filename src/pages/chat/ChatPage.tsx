@@ -4,7 +4,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useMediaUpload } from "@/hooks/useMediaUpload";
 import { useState, useRef, useEffect, useCallback, Suspense, lazy } from "react";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { toast } from "sonner";
 import { useNavigate, useLocation, type NavigateOptions, type To } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";

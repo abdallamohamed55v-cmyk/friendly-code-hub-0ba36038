@@ -4,7 +4,7 @@ import { Pin, Plus, PanelLeft, LogIn, Cloud, Sparkles, LayoutGrid } from "lucide
 import { supabase } from "@/integrations/supabase/client";
 import { getUserSafe } from "@/lib/authSafe";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m as motion } from "framer-motion";
 import { useSidebarCollapsed } from "@/hooks/useSidebarCollapsed";
 import MegsyStar from "@/components/files/MegsyStar";
 import { useBrandLogo } from "@/hooks/useBrandLogo";

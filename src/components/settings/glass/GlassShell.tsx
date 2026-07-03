@@ -1,7 +1,7 @@
 /** @doc Unified glass design primitives for mobile settings pages. */
 import { ReactNode, MouseEventHandler } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, type HTMLMotionProps } from "framer-motion";
+import { m as motion, type HTMLMotionProps } from "framer-motion";
 import { ChevronRight, ArrowLeft, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 

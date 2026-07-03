@@ -2,7 +2,7 @@
 // Uses pdfjs-dist to render the first page as preview and all pages in modal.
 
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { Download, Eye, ArrowLeft, Loader2, Share2 } from "lucide-react";
 import MegsyStar from "@/components/files/MegsyStar";
 import { supabase } from "@/integrations/supabase/client";

@@ -1,7 +1,7 @@
 /** @doc Dedicated SEO landing page for a single AI model, served at /ai-chat/models/:slug. */
 import { useRef } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m as motion, useScroll, useTransform } from "framer-motion";
 import LandingNavbar from "@/components/landing/LandingNavbar";
 import LandingFooter from "@/components/landing/LandingFooter";
 import SEOHead from "@/components/common/SEOHead";

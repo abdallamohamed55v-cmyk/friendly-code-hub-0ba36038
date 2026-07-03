@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import type { ComponentType } from "react";
 
 export interface MegsyOsIntroBodyProps {

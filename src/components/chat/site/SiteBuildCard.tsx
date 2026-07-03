@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 import JSZip from "jszip";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";

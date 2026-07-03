@@ -1,7 +1,7 @@
 /** @doc Post-checkout success page confirming a plan upgrade or top-up. */
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
   Loader2,

@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
+import { LazyMotion, domMax } from "framer-motion";
 import App from "./App.tsx";
 import "./index.css";
 import "./styles/claude-chat.css";
@@ -163,6 +164,8 @@ if (savedBubble) document.documentElement.style.setProperty("--user-bubble", sav
 
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
-    <App />
+    <LazyMotion features={domMax} strict={false}>
+      <App />
+    </LazyMotion>
   </HelmetProvider>,
 );

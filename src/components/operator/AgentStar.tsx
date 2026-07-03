@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { useZone } from "@/contexts/ZoneContext";
 
 export type AgentKey = "ceo" | "coo" | "cto" | "executor" | "assistant" | "system";

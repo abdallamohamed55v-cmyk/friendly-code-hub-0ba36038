@@ -1,5 +1,5 @@
 import { memo, useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m as motion, useReducedMotion } from "framer-motion";
 import { Brain, Check, ChevronDown, Wrench } from "lucide-react";
 import MegsyStar from "@/components/files/MegsyStar";
 import { resolveToolActivity, brandIconUrl } from "@/lib/toolActivity";

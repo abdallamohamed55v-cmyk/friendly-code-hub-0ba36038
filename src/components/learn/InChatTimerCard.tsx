@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { Pause, Play, X, Timer as TimerIcon } from "lucide-react";
 
 interface Props {

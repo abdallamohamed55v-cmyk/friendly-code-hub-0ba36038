@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Loader2, AlertCircle, Search, Sparkles, PenLine, Check } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import {
   subscribeToResearchJob,
   approveResearchPlan,

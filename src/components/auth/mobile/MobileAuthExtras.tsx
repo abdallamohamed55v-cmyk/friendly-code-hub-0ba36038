@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useRef } from "react";
 

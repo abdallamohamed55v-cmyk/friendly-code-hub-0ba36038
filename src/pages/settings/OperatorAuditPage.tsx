@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { Loader2, ScrollText } from "lucide-react";
 import { GlassPage, GlassCard, glassStagger } from "@/components/settings/glass/GlassShell";
 

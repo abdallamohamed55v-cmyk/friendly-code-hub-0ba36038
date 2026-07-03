@@ -1,6 +1,6 @@
 /** @doc Shared cartoon shell for public marketing pages — matches the Referrals page visual language. */
 import { ReactNode, lazy, Suspense } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import LandingNavbar from "@/components/landing/LandingNavbar";
 import {
   INK,

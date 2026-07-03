@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m as motion } from "framer-motion";
 
 interface RemoteAiBusyBannerProps {
   remoteAiBusy: { name: string } | null;

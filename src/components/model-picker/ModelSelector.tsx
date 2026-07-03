@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m as motion } from "framer-motion";
 import ModelPickerSheet from "./ModelPickerSheet";
 import { glassModelMenu, glassModelMenuStyle, glassModelMenuTriggerStyle } from "./glassModelMenuStyles";
 
