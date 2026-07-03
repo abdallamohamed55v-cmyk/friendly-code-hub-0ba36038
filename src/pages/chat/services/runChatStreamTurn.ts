@@ -227,7 +227,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
     if (!safeChunk.trim()) return;
     if (videoGenerationActive) {
       if (generatedVideos.length > 0) {
-        assistantContent = "اتفضل الفيديو 👇";
+        assistantContent = "Here is your video 👇";
         scheduleAssistantUpdate(true);
       }
       return;
@@ -656,7 +656,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
                   const next = prev.slice();
                   next[targetIndex] = {
                     ...last,
-                    content: last.content?.trim() ? last.content : "اتفضل الفيديو 👇",
+                    content: last.content?.trim() ? last.content : "Here is your video 👇",
                     videos: [...existing, url],
                   };
                   return next;

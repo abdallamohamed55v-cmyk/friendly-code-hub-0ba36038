@@ -33,7 +33,7 @@ export default function WorkspaceSwitcher({ children, align = "start", side = "t
 
   const switchTo = async (id: string | null, name: string) => {
     await setActive(id);
-    toast.success(`تم التبديل إلى ${name}`);
+    toast.success(`Switched to ${name}`);
     setOpen(false);
   };
 
@@ -64,7 +64,7 @@ export default function WorkspaceSwitcher({ children, align = "start", side = "t
                 className="text-[10px] font-extrabold uppercase tracking-[0.18em]"
                 style={{ color: INK, opacity: 0.8 }}
               >
-                الحساب النشط
+                Active account
               </p>
               <p
                 className="text-[14px] font-extrabold truncate tracking-tight"
@@ -85,7 +85,7 @@ export default function WorkspaceSwitcher({ children, align = "start", side = "t
           {/* Workspaces list */}
           <div className="max-h-72 overflow-y-auto py-1">
             <button
-              onClick={() => switchTo(null, "شخصي")}
+              onClick={() => switchTo(null, "Personal")}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition active:translate-x-[1px] active:translate-y-[1px]"
               style={{ color: TEXT }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = SURFACE_2)}
@@ -95,14 +95,14 @@ export default function WorkspaceSwitcher({ children, align = "start", side = "t
                 className="w-8 h-8 rounded-xl grid place-items-center text-[12px] font-extrabold shrink-0"
                 style={{ backgroundColor: LAVENDER, color: INK, border: `2px solid ${INK}` }}
               >
-                ش
+                P
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-extrabold truncate" style={{ color: TEXT }}>
-                  شخصي
+                  Personal
                 </p>
                 <p className="text-[11px] font-bold" style={{ color: MUTED }}>
-                  مساحتك الخاصة
+                  Your personal space
                 </p>
               </div>
               {activeId === null && (
@@ -112,7 +112,7 @@ export default function WorkspaceSwitcher({ children, align = "start", side = "t
 
             {loading ? (
               <p className="px-4 py-2 text-[11px] font-bold" style={{ color: MUTED }}>
-                جاري التحميل…
+                Loading…
               </p>
             ) : (
               workspaces.map((w) => (
@@ -176,7 +176,7 @@ export default function WorkspaceSwitcher({ children, align = "start", side = "t
                   style={{ color: MUTED }}
                   strokeWidth={2.5}
                 />
-                إدارة مساحة العمل الحالية
+                Manage current workspace
               </button>
             )}
             <button
@@ -190,7 +190,7 @@ export default function WorkspaceSwitcher({ children, align = "start", side = "t
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
             >
               <Users className="w-4 h-4 shrink-0" style={{ color: MUTED }} strokeWidth={2.5} />
-              كل مساحات العمل
+              All workspaces
             </button>
             <button
               onClick={() => {

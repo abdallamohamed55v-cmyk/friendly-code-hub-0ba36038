@@ -352,12 +352,12 @@ const ReferralsPage = () => {
 
   const shareLink = async () => {
     if (!link) return;
-    const shareText = `جرب Megsy AI واحصل على ${CREDITS_PER_SIGNUP} رصيدًا مجانيًا عند التسجيل باستخدام رابط الدعوة الخاص بي:\n${link}`;
+    const shareText = `Try Megsy AI and get ${CREDITS_PER_SIGNUP} free credits when you sign up with my invite link:\n${link}`;
     if (navigator.share) {
       try {
         await navigator.share({
           title: "Megsy AI",
-          text: `جرب Megsy AI واحصل على ${CREDITS_PER_SIGNUP} رصيدًا مجانيًا عند التسجيل باستخدام رابط الدعوة الخاص بي:`,
+          text: `Try Megsy AI and get ${CREDITS_PER_SIGNUP} free credits when you sign up with my invite link:`,
           url: link,
         });
         return;
@@ -366,7 +366,7 @@ const ReferralsPage = () => {
       }
     }
     await safeCopyText(shareText);
-    toast.success("تم نسخ رسالة الدعوة والرابط بنجاح!");
+    toast.success("Invite message and link copied!");
   };
 
   const openPromoter = () => {
@@ -635,7 +635,7 @@ const ShareSheet = ({ link, onClose, onCopy }: ShareSheetProps) => {
     } catch {
       /* noop */
     }
-    toast.success(`تم نسخ الرسالة — افتح ${label} والصق`);
+    toast.success(`Message copied — open ${label} and paste`);
     window.open(url, "_blank", "noopener,noreferrer");
   };
 

@@ -48,10 +48,10 @@ const ParallelAgentsPanel = ({ tasks, active = true }: Props) => {
   const done = visibleTasks.filter((task) => task.status === "done").length;
   const intro = isArabic
     ? running > 1
-      ? `بدأت أشغّل ${running} مهام مع بعض`
+      ? `Started ${running} tasks in parallel`
       : running === 1
-        ? "شغّال على المهمة دلوقتي"
-        : "المهام خلصت"
+        ? "Working on the task now"
+        : "Tasks finished"
     : running > 1
       ? `Running ${running} tasks together`
       : running === 1
@@ -73,7 +73,7 @@ const ParallelAgentsPanel = ({ tasks, active = true }: Props) => {
           <div className="text-[13px] font-semibold leading-tight">{intro}</div>
           <div className="text-[11px] text-muted-foreground">
             {isArabic
-              ? `${done}/${visibleTasks.length} خلصوا`
+              ? `${done}/${visibleTasks.length} done`
               : `${done}/${visibleTasks.length} complete`}
           </div>
         </div>

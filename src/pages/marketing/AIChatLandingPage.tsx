@@ -174,7 +174,7 @@ const ModelSection = ({
                 to={`/ai-chat/models/${model.id}`}
                 className="inline-flex items-center gap-2 rounded-full bg-foreground px-7 py-3.5 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
               >
-                اكتشف {model.name} →
+                Explore {model.name} →
               </Link>
               <Link
                 to="/chat"

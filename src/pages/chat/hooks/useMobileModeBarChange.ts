@@ -59,7 +59,7 @@ export function useMobileModeBarChange(
       if (withWebsite && m === "website") {
         setSelectedAgent(null);
         setSelectedModel(null);
-        setInput?.("ابني لي موقع كامل (React 18 + Tailwind، يتنشر فوراً ويديني رابط). الفكرة: ");
+        setInput?.("Build me a full site (React 18 + Tailwind, deploys instantly and gives me a URL). Idea: ");
         setChatMode("normal" as ChatMode);
         return;
       }

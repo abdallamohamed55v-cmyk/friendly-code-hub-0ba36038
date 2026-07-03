@@ -897,7 +897,7 @@ const ChatMessage = ({
       } catch {}
       window.open(res.url, "_blank", "noopener,noreferrer");
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "فشل النشر";
+      const message = e instanceof Error ? e.message : "Publish failed";
       setPublishState({ status: "error", message });
     }
   }, [projectFiles, content]);
@@ -1278,10 +1278,10 @@ const ChatMessage = ({
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-[13px] font-bold text-white">
-                      معاينة المشروع
+                      Project preview
                     </span>
                     <span className="block text-[11px] text-white/60 truncate">
-                      {projectFiles.length} ملف · اضغط للتشغيل والاستعراض
+                      {projectFiles.length} files · Click to run and browse
                     </span>
                   </span>
                 </button>
@@ -1294,9 +1294,9 @@ const ChatMessage = ({
                     <FolderTree className="w-4 h-4" />
                   </span>
                   <span className="flex-1 min-w-0">
-                    <span className="block text-[13px] font-bold text-white">الملفات</span>
+                    <span className="block text-[13px] font-bold text-white">Files</span>
                     <span className="block text-[11px] text-white/60 truncate">
-                      {projectFiles.length} ملف · تصفح وحرر
+                      {projectFiles.length} files · Browse and edit
                     </span>
                   </span>
                 </button>

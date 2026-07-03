@@ -792,7 +792,7 @@ const ChatPage = () => {
       ].includes(planLowerCode);
       if (!isPaidPlanCode) {
         if (!chatUserId) {
-          toast.error("سجّل الدخول واشترك لاستخدام وضع البرمجة.");
+          toast.error("Sign in and subscribe to use Coder mode.");
           zoneNavigate(
             `/auth?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`,
           );
@@ -810,7 +810,7 @@ const ChatPage = () => {
             role: "assistant",
             clientId: `assist-code-paywall-${Date.now()}`,
             content:
-              "🔒 وضع البرمجة (Coder) متاح فقط للمشتركين. رقّي خطتك لتبدأ في بناء مواقع وتطبيقات كاملة داخل الشات.",
+              "🔒 Coder mode is available to subscribers only. Upgrade your plan to start building full sites and apps inside chat.",
             mode: "code",
             paywall: { feature: "code" },
           } as Message,
