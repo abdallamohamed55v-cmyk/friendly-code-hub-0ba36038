@@ -2,7 +2,24 @@
 <html lang="en" translate="no">
   <head>
     <meta charset="UTF-8" />
+    <!-- Critical anti-flash CSS: paints the app's pure-black background before
+         React or the main stylesheet load. Prevents the white/black flash on
+         first paint (mobile Safari, cold PWA launches, slow 3G). Must stay
+         inline and byte-small. -->
+    <style>
+      :root { color-scheme: dark; }
+      html, body { background-color: #000; margin: 0; }
+      #root { min-height: 100dvh; background-color: #000; }
+      /* iOS Safari paints white until first React frame — cover it. */
+      #root:empty::before {
+        content: "";
+        position: fixed; inset: 0;
+        background: #000;
+        z-index: 0;
+      }
+    </style>
     <meta name="google" content="notranslate" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -88,7 +105,20 @@
       </defs>
     </svg>
     <div id="root"></div>
+    <!-- Speculation Rules API (Chromium 111+): prerender same-origin links on
+         moderate hover intent. Falls back silently on Safari/Firefox. -->
+    <script type="speculationrules">
+      {
+        "prerender": [
+          { "source": "document", "where": { "and": [ { "href_matches": "/*" }, { "not": { "href_matches": "/api/*" } }, { "not": { "href_matches": "/auth/*" } } ] }, "eagerness": "moderate" }
+        ],
+        "prefetch": [
+          { "source": "document", "where": { "href_matches": "/*" }, "eagerness": "conservative" }
+        ]
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
+
 
   </body>
 </html>

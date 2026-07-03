@@ -6,6 +6,8 @@ import "./styles/claude-chat.css";
 import "./styles/settings-amber.css";
 import "./styles/pwa-safe-area.css";
 import "./styles/pwa-responsive.css";
+import "./styles/view-transitions.css";
+
 
 
 // All fonts are loaded via Google Fonts <link> in index.html (Space Grotesk,
@@ -18,7 +20,9 @@ import { toast as sonnerToast } from "sonner";
 import { patchSupabaseAuth } from "@/integrations/supabase/patchAuth";
 import { installGlobalLinkPrefetch } from "@/lib/globalLinkPrefetch";
 import { installThemeColorSync } from "@/lib/themeColorSync";
+import { installViewTransitions } from "@/lib/installViewTransitions";
 import { registerAppServiceWorker } from "@/lib/registerSW";
+
 
 // If Vercel ever serves the static 404 fallback before SPA rewrites apply,
 // public/404.html redirects here with the original path encoded. Restore it
@@ -37,7 +41,9 @@ import { registerAppServiceWorker } from "@/lib/registerSW";
 patchSupabaseAuth();
 installGlobalLinkPrefetch();
 installThemeColorSync();
+installViewTransitions();
 registerAppServiceWorker();
+
 
 // Globally sanitize every toast message so we never leak provider names or
 // the raw "Edge Function returned a non-2xx status code" string to users.
