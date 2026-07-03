@@ -148,7 +148,7 @@ const LandingPage = ({ locale = "en" }: LandingPageProps) => {
   return (
     <LandingContentProvider locale={locale}>
       <LandingSEO />
-      <LazyMotion features={domAnimation} strict>
+      <LazyMotion features={domAnimation}>
         <div data-theme="dark" className="min-h-dvh overflow-x-clip bg-background text-foreground">
           <LandingNavbar />
           {starReady && (
