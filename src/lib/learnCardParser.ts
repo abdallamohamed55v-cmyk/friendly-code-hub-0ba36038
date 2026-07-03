@@ -96,10 +96,29 @@ function normalizeCard(obj: any): any {
       return [String(p ?? ""), ""];
     });
   }
+  // Ordering card: normalize `steps` / `items` / `sequence` into `steps: string[]`
+  // and derive `correct` = the ordered indices [0..n-1] if not provided.
+  if (obj.type === "ordering") {
+    const raw = obj.steps ?? obj.items ?? obj.sequence ?? obj.options ?? [];
+    if (Array.isArray(raw)) {
+      obj.steps = raw.map((s: any) => (typeof s === "string" ? s : String(s?.text ?? s?.label ?? s ?? "")));
+      if (!Array.isArray(obj.correct)) obj.correct = obj.steps.map((_: any, i: number) => i);
+    }
+  }
+  // Scenario: normalize branching `choices`
+  if (obj.type === "scenario" && Array.isArray(obj.choices)) {
+    obj.choices = obj.choices.map((c: any) => {
+      if (typeof c === "string") return { text: c };
+      return {
+        text: String(c?.text ?? c?.label ?? ""),
+        outcome: c?.outcome ?? c?.result ?? "",
+        correct: c?.correct === true || c?.best === true,
+      };
+    });
+  }
   return obj;
 }
 
-function tryParseCard(raw: string): LearnCardData | null {
   try {
     const obj = normalizeCard(JSON.parse(raw.trim()));
     if (!obj || typeof obj !== "object") return null;
