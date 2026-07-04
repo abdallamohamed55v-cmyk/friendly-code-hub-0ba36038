@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const KASHIER_MERCHANT_ID = Deno.env.get("KASHIER_MERCHANT_ID") ?? "";
 const KASHIER_SECRET_KEY = Deno.env.get("KASHIER_SECRET_KEY") ?? "";
-const KASHIER_MODE = (Deno.env.get("KASHIER_MODE") ?? "test").toLowerCase();
+const KASHIER_MODE = (Deno.env.get("KASHIER_MODE") ?? "live").toLowerCase() === "test" ? "test" : "live";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
