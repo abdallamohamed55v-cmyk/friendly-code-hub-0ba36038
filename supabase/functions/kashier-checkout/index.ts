@@ -3,7 +3,7 @@ import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const KASHIER_MERCHANT_ID = Deno.env.get("KASHIER_MERCHANT_ID") ?? "";
-const KASHIER_IFRAME_KEY = Deno.env.get("KASHIER_IFRAME_KEY") ?? "";
+const KASHIER_SECRET_KEY = Deno.env.get("KASHIER_SECRET_KEY") ?? "";
 const KASHIER_MODE = (Deno.env.get("KASHIER_MODE") ?? "test").toLowerCase();
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -39,9 +39,9 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405);
 
   try {
-    if (!KASHIER_MERCHANT_ID || !KASHIER_IFRAME_KEY) {
+    if (!KASHIER_MERCHANT_ID || !KASHIER_SECRET_KEY) {
       return jsonResponse(
-        { error: "Kashier is not configured. Set KASHIER_MERCHANT_ID and KASHIER_IFRAME_KEY." },
+        { error: "Kashier is not configured. Set KASHIER_MERCHANT_ID and KASHIER_SECRET_KEY." },
         500,
       );
     }
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     }
 
     const path = `/?payment=${KASHIER_MERCHANT_ID}.${orderId}.${amountStr}.${currency}`;
-    const hash = await hmacHex(KASHIER_IFRAME_KEY, path);
+    const hash = await hmacHex(KASHIER_SECRET_KEY, path);
 
     const webhookUrl = `${SUPABASE_URL}/functions/v1/kashier-webhook`;
     const merchantRedirect = redirectUrl
